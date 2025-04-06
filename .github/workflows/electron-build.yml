@@ -1,0 +1,47 @@
+name: Build Electron App
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build React App
+      run: npm run build
+    
+    # You'll need to add electron-builder configuration to package.json
+    # and add a script like "electron:build": "electron-builder"
+    
+    # - name: Build Electron App
+    #   run: npm run electron:build
+    
+    # - name: Upload Artifacts
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: ${{ matrix.os }}-build
+    #     path: |
+    #       dist/*.exe
+    #       dist/*.dmg
+    #       dist/*.AppImage
+    #       dist/*.snap
+    #       dist/*.deb
+    #       dist/*.rpm 
