@@ -21,27 +21,28 @@ jobs:
       with:
         node-version: 18
         cache: 'npm'
+        cache-dependency-path: 'cmr-vision/package-lock.json'
     
     - name: Install dependencies
-      run: npm ci
+      run: cd cmr-vision && npm ci
     
     - name: Build React App
-      run: npm run build
+      run: cd cmr-vision && npm run build
     
     # You'll need to add electron-builder configuration to package.json
     # and add a script like "electron:build": "electron-builder"
     
     # - name: Build Electron App
-    #   run: npm run electron:build
+    #   run: cd cmr-vision && npm run electron:build
     
     # - name: Upload Artifacts
     #   uses: actions/upload-artifact@v3
     #   with:
     #     name: ${{ matrix.os }}-build
     #     path: |
-    #       dist/*.exe
-    #       dist/*.dmg
-    #       dist/*.AppImage
-    #       dist/*.snap
-    #       dist/*.deb
-    #       dist/*.rpm 
+    #       cmr-vision/dist/*.exe
+    #       cmr-vision/dist/*.dmg
+    #       cmr-vision/dist/*.AppImage
+    #       cmr-vision/dist/*.snap
+    #       cmr-vision/dist/*.deb
+    #       cmr-vision/dist/*.rpm 

@@ -22,12 +22,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: 'cmr-vision/package-lock.json'
     
     - name: Install dependencies
-      run: npm ci
+      run: cd cmr-vision && npm ci
     
     - name: Build
-      run: npm run build
+      run: cd cmr-vision && npm run build
       
     # Optional deployment steps
     # - name: Deploy to GitHub Pages
@@ -35,4 +36,4 @@ jobs:
     #   uses: JamesIves/github-pages-deploy-action@v4
     #   with:
     #     branch: gh-pages
-    #     folder: build 
+    #     folder: cmr-vision/build 
