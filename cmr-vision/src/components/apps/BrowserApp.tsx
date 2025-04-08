@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Html } from '@react-three/drei';
-import * as THREE from 'three';
 
 const BrowserApp: React.FC = () => {
   const [url, setUrl] = useState('https://duckduckgo.com/');
@@ -12,7 +11,7 @@ const BrowserApp: React.FC = () => {
       // Check if input is a valid URL
       if (searchInput.match(/^(http|https):\/\//)) {
         setUrl(searchInput);
-      } else if (searchInput.match(/^[a-zA-Z0-9]+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/)) {
+      } else if (searchInput.match(/^[a-zA-Z0-9]+([-\.][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/)) {
         setUrl(`https://${searchInput}`);
       } else {
         // Treat as search query

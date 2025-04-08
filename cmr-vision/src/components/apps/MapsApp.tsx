@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Html } from '@react-three/drei';
-import * as THREE from 'three';
 
 const MapsApp: React.FC = () => {
   return (

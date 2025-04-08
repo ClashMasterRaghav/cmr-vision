@@ -30,7 +30,8 @@ jobs:
       
       - name: Build
         working-directory: ./cmr-vision
-        run: npm run build
+        run: |
+          CI=false npm run build
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
