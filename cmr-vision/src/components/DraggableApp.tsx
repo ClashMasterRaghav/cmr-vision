@@ -10,6 +10,14 @@ interface DraggableAppProps {
   onPositionChange?: (position: THREE.Vector3) => void;
 }
 
+// Extend ThreeEvent to add intersection properties
+interface ThreeEvent extends React.PointerEvent<HTMLElement> {
+  point: THREE.Vector3;
+  object: THREE.Object3D;
+  distance: number;
+  // Add any other properties that might be used
+}
+
 const DraggableApp: React.FC<DraggableAppProps> = ({ 
   children, 
   position,
@@ -29,10 +37,10 @@ const DraggableApp: React.FC<DraggableAppProps> = ({
   const titleBarHeight = height * 0.1;
   
   // Handle pointer down on the title bar
-  const onPointerDown = (e: React.PointerEvent) => {
+  const onPointerDown = (e: ThreeEvent) => {
     // Check if the click is in the title bar area
     // title bar is at the top of the panel
-    const appHeight = e.object.geometry.parameters.height;
+    const appHeight = (e.object as THREE.Mesh).geometry.parameters.height;
     const localY = e.point.y - (e.object.position.y - appHeight/2);
     
     // Only allow dragging from the title bar area (top portion)
