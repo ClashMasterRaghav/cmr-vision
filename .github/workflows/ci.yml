@@ -22,18 +22,21 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: cmr-vision/package-lock.json
     
     - name: Install dependencies
+      working-directory: ./cmr-vision
       run: npm install
     
     - name: Build
+      working-directory: ./cmr-vision
       run: npm run build
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build
-        path: build
+        path: cmr-vision/build
         retention-days: 5
       
     # Optional deployment steps

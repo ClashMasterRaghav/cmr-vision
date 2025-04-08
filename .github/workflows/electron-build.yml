@@ -21,19 +21,23 @@ jobs:
       with:
         node-version: 18
         cache: 'npm'
+        cache-dependency-path: cmr-vision/package-lock.json
     
     - name: Install dependencies
+      working-directory: ./cmr-vision
       run: npm install
     
     - name: Build React App
+      working-directory: ./cmr-vision
       run: npm run build
     
     - name: Build Electron App
+      working-directory: ./cmr-vision
       run: npm run electron:build
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-build
-        path: dist/*
+        path: cmr-vision/dist/*
         retention-days: 5 
