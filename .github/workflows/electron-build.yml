@@ -36,9 +36,9 @@ jobs:
       working-directory: ./cmr-vision
       run: |
         echo "Installing dependencies..."
-        npm install
+        npm install --legacy-peer-deps
         echo "Installing TypeScript types..."
-        npm install --save-dev @types/three @types/react @types/react-dom typescript
+        npm install --save-dev @types/three @types/react @types/react-dom typescript --legacy-peer-deps
     
     - name: Build React App
       working-directory: ./cmr-vision
