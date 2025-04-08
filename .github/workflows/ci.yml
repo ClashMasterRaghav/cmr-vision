@@ -15,17 +15,17 @@ jobs:
         node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         path: 'cmr-vision'
     
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
     
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: npm-cache
       with:
         path: cmr-vision/node_modules
@@ -43,7 +43,7 @@ jobs:
       run: npm run build
       
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build
         path: cmr-vision/build

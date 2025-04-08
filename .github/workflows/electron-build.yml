@@ -14,17 +14,17 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         path: 'cmr-vision'
     
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 18
     
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: npm-cache
       with:
         path: cmr-vision/node_modules
@@ -46,7 +46,7 @@ jobs:
       run: npm run electron:build
     
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-build
         path: |
