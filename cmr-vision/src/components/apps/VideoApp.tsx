@@ -23,7 +23,7 @@ const VideoApp: React.FC = () => {
       textureRef.current = new THREE.VideoTexture(videoRef.current);
       textureRef.current.minFilter = THREE.LinearFilter;
       textureRef.current.magFilter = THREE.LinearFilter;
-      textureRef.current.format = THREE.RGBFormat;
+      textureRef.current.format = THREE.RGBAFormat;
       
       // Play video
       videoRef.current.play().catch(error => {
