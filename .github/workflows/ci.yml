@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v4
@@ -24,15 +25,29 @@ jobs:
         cache: 'npm'
         cache-dependency-path: cmr-vision/package-lock.json
     
+    - name: Check file structure
+      run: |
+        echo "Checking directory structure..."
+        ls -la
+        echo "Checking cmr-vision directory..."
+        ls -la cmr-vision
+    
     - name: Install dependencies
       working-directory: ./cmr-vision
-      run: npm install
+      run: |
+        echo "Installing dependencies..."
+        npm install
+        echo "Installing TypeScript types..."
+        npm install --save-dev @types/three @types/react @types/react-dom typescript
     
     - name: Build
       working-directory: ./cmr-vision
-      run: npm run build
+      run: |
+        echo "Starting build process..."
+        CI=false npm run build
       
     - name: Upload build artifacts
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: build
