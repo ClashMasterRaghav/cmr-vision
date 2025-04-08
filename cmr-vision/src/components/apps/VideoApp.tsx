@@ -55,25 +55,26 @@ const VideoApp: React.FC = () => {
 
   return (
     <group>
-      <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
-        {videoError ? (
-          <meshBasicMaterial color="#000000">
-            <Text 
-              position={[0, 0, 0.06]} 
-              color="white" 
-              fontSize={0.5}
-              anchorX="center"
-              anchorY="middle"
-            >
-              Video not available
-            </Text>
-          </meshBasicMaterial>
-        ) : (
+      {videoError ? (
+        <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
+          <meshBasicMaterial color="#000000" />
+          <Text 
+            position={[0, 0, 0.06]} 
+            color="white" 
+            fontSize={0.5}
+            anchorX="center"
+            anchorY="middle"
+          >
+            Video not available
+          </Text>
+        </Box>
+      ) : (
+        <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
           <meshBasicMaterial attach="material">
             {textureRef.current && <videoTexture attach="map" args={[videoRef.current!]} />}
           </meshBasicMaterial>
-        )}
-      </Box>
+        </Box>
+      )}
       
       {/* Video controls */}
       <Box args={[16, 1, 0.1]} position={[0, -5, 0]}>

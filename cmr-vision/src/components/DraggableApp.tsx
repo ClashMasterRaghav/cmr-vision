@@ -1,21 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
-import { AppType } from '../App';
 
 interface DraggableAppProps {
   children: React.ReactNode;
   position: THREE.Vector3;
   size: [number, number, number];
   onPositionChange?: (position: THREE.Vector3) => void;
-}
-
-// Extend ThreeEvent to add intersection properties
-interface ThreeEvent extends React.PointerEvent<HTMLElement> {
-  point: THREE.Vector3;
-  object: THREE.Object3D;
-  distance: number;
-  // Add any other properties that might be used
 }
 
 const DraggableApp: React.FC<DraggableAppProps> = ({ 
@@ -37,7 +28,7 @@ const DraggableApp: React.FC<DraggableAppProps> = ({
   const titleBarHeight = height * 0.1;
   
   // Handle pointer down on the title bar
-  const onPointerDown = (e: ThreeEvent) => {
+  const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     
     // Calculate relative position in the title bar
@@ -70,7 +61,7 @@ const DraggableApp: React.FC<DraggableAppProps> = ({
   };
   
   // Handle pointer up - end dragging
-  const onPointerUp = () => {
+  const onPointerUp = (e: ThreeEvent<PointerEvent>) => {
     setIsDragging(false);
   };
   

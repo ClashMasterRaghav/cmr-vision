@@ -3,18 +3,32 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Interface for DeviceOrientationEvent
-interface DeviceOrientationProps {
-  alpha: number | null;
-  beta: number | null;
-  gamma: number | null;
+// Type for the orientation data
+interface OrientationData {
+  alpha: number;
+  beta: number;
+  gamma: number;
+}
+
+// Interface for DeviceOrientationEvent with requestPermission
+interface DeviceOrientationEventWithPermission extends DeviceOrientationEvent {
+  requestPermission?: () => Promise<string>;
+}
+
+// Interface for Window with DeviceOrientationEvent
+interface WindowWithDeviceOrientation extends Window {
+  DeviceOrientationEvent: {
+    prototype: DeviceOrientationEvent;
+    new(): DeviceOrientationEvent;
+    requestPermission?: () => Promise<string>;
+  };
 }
 
 const ARCamera: React.FC = () => {
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
   const [hasPermission, setHasPermission] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const orientationRef = useRef<{alpha: number, beta: number, gamma: number}>({ alpha: 0, beta: 0, gamma: 0 });
+  const orientationRef = useRef<OrientationData>({ alpha: 0, beta: 0, gamma: 0 });
   
   // Request device orientation permissions
   useEffect(() => {
@@ -30,13 +44,13 @@ const ARCamera: React.FC = () => {
     };
 
     // Check if DeviceOrientationEvent exists and if we need to request permission
-    if (typeof window !== 'undefined' && 
-        typeof window.DeviceOrientationEvent !== 'undefined') {
+    const windowWithOrientation = window as WindowWithDeviceOrientation;
+    if (typeof windowWithOrientation !== 'undefined' && 
+        typeof windowWithOrientation.DeviceOrientationEvent !== 'undefined') {
       
       // iOS 13+ requires permission
-      const requestPermission = (window.DeviceOrientationEvent as any).requestPermission;
-      if (typeof requestPermission === 'function') {
-        requestPermission()
+      if (typeof windowWithOrientation.DeviceOrientationEvent.requestPermission === 'function') {
+        windowWithOrientation.DeviceOrientationEvent.requestPermission()
           .then((response: string) => {
             if (response === 'granted') {
               setHasPermission(true);
@@ -56,9 +70,7 @@ const ARCamera: React.FC = () => {
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('deviceorientation', handleDeviceOrientation);
-      }
+      window.removeEventListener('deviceorientation', handleDeviceOrientation);
     };
   }, []);
 
@@ -124,7 +136,6 @@ const ARCamera: React.FC = () => {
     const quaternion = new THREE.Quaternion();
     
     // Apply device orientation to camera
-    // This needs adjustment based on device orientation and desired camera behavior
     const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
     quaternion.setFromEuler(euler);
     
