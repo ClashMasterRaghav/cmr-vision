@@ -1,21 +1,22 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
-import { Box } from '@react-three/drei';
+import { Box, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 const VideoApp: React.FC = () => {
   const { gl } = useThree();
-  const videoRef = useRef<HTMLVideoElement>();
-  const textureRef = useRef<THREE.VideoTexture>();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const textureRef = useRef<THREE.VideoTexture | null>(null);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     // Create video element
     if (!videoRef.current) {
       videoRef.current = document.createElement('video');
-      videoRef.current.src = '/sample-video.mp4'; // This should be placed in the public folder
+      videoRef.current.src = '/assets/ar_Tek_It.mp4'; // Path relative to public folder
       videoRef.current.crossOrigin = 'anonymous';
       videoRef.current.loop = true;
-      videoRef.current.muted = false;
+      videoRef.current.muted = true; // Muted to allow autoplay
       videoRef.current.style.display = 'none';
       document.body.appendChild(videoRef.current);
       
@@ -28,6 +29,13 @@ const VideoApp: React.FC = () => {
       // Play video
       videoRef.current.play().catch(error => {
         console.error("Error playing video:", error);
+        setVideoError(true);
+      });
+      
+      // Add error handler for video loading errors
+      videoRef.current.addEventListener('error', () => {
+        console.error("Error loading video");
+        setVideoError(true);
       });
     }
     
@@ -35,12 +43,12 @@ const VideoApp: React.FC = () => {
       if (videoRef.current) {
         videoRef.current.pause();
         document.body.removeChild(videoRef.current);
-        videoRef.current = undefined;
+        videoRef.current = null;
       }
       
       if (textureRef.current) {
         textureRef.current.dispose();
-        textureRef.current = undefined;
+        textureRef.current = null;
       }
     };
   }, [gl]);
@@ -48,9 +56,23 @@ const VideoApp: React.FC = () => {
   return (
     <group>
       <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
-        <meshBasicMaterial attach="material">
-          {textureRef.current && <videoTexture attach="map" args={[videoRef.current!]} />}
-        </meshBasicMaterial>
+        {videoError ? (
+          <meshBasicMaterial color="#000000">
+            <Text 
+              position={[0, 0, 0.06]} 
+              color="white" 
+              fontSize={0.5}
+              anchorX="center"
+              anchorY="middle"
+            >
+              Video not available
+            </Text>
+          </meshBasicMaterial>
+        ) : (
+          <meshBasicMaterial attach="material">
+            {textureRef.current && <videoTexture attach="map" args={[videoRef.current!]} />}
+          </meshBasicMaterial>
+        )}
       </Box>
       
       {/* Video controls */}

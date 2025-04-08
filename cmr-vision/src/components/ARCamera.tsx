@@ -3,33 +3,62 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
+// Interface for DeviceOrientationEvent
+interface DeviceOrientationProps {
+  alpha: number | null;
+  beta: number | null;
+  gamma: number | null;
+}
+
 const ARCamera: React.FC = () => {
   const { camera, gl } = useThree();
-  const [hasPermission, setHasPermission] = useState<boolean>(false);
+  const [hasPermission, setHasPermission] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const orientationRef = useRef<{alpha: number, beta: number, gamma: number}>({ alpha: 0, beta: 0, gamma: 0 });
   
   // Request device orientation permissions
   useEffect(() => {
+    // Setup a safe event handler that works in all browsers
+    const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+      if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
+        orientationRef.current = {
+          alpha: event.alpha, // Compass direction (0-360)
+          beta: event.beta,   // Front-to-back tilt (-180-180)
+          gamma: event.gamma  // Left-to-right tilt (-90-90)
+        };
+      }
+    };
+
     // Check if DeviceOrientationEvent exists and if we need to request permission
-    if (typeof DeviceOrientationEvent !== 'undefined' && 
-        typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-      (DeviceOrientationEvent as any).requestPermission()
-        .then((response: string) => {
-          if (response === 'granted') {
-            setHasPermission(true);
-            window.addEventListener('deviceorientation', handleOrientation);
-          }
-        })
-        .catch(console.error);
+    if (typeof window !== 'undefined' && 
+        typeof window.DeviceOrientationEvent !== 'undefined') {
+      
+      // iOS 13+ requires permission
+      const requestPermission = (window.DeviceOrientationEvent as any).requestPermission;
+      if (typeof requestPermission === 'function') {
+        requestPermission()
+          .then((response: string) => {
+            if (response === 'granted') {
+              setHasPermission(true);
+              window.addEventListener('deviceorientation', handleDeviceOrientation);
+            }
+          })
+          .catch((error: any) => {
+            console.error('Error requesting device orientation permission:', error);
+          });
+      } else {
+        // For devices that don't require permission
+        setHasPermission(true);
+        window.addEventListener('deviceorientation', handleDeviceOrientation);
+      }
     } else {
-      // For devices that don't require permission
-      setHasPermission(true);
-      window.addEventListener('deviceorientation', handleOrientation);
+      console.warn('Device orientation not supported by this browser');
     }
 
     return () => {
-      window.removeEventListener('deviceorientation', handleOrientation);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('deviceorientation', handleDeviceOrientation);
+      }
     };
   }, []);
 
@@ -60,7 +89,9 @@ const ARCamera: React.FC = () => {
       .then(stream => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.play();
+          videoRef.current.play().catch(err => {
+            console.error('Error playing video:', err);
+          });
         }
       })
       .catch(error => {
@@ -79,17 +110,6 @@ const ARCamera: React.FC = () => {
       }
     };
   }, [hasPermission]);
-
-  // Handle device orientation changes
-  const handleOrientation = (event: DeviceOrientationEvent) => {
-    if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
-      orientationRef.current = {
-        alpha: event.alpha, // Compass direction (0-360)
-        beta: event.beta,   // Front-to-back tilt (-180-180)
-        gamma: event.gamma  // Left-to-right tilt (-90-90)
-      };
-    }
-  };
 
   // Update camera rotation based on device orientation
   useFrame(() => {

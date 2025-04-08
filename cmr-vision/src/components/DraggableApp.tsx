@@ -38,14 +38,13 @@ const DraggableApp: React.FC<DraggableAppProps> = ({
   
   // Handle pointer down on the title bar
   const onPointerDown = (e: ThreeEvent) => {
-    // Check if the click is in the title bar area
-    // title bar is at the top of the panel
-    const appHeight = (e.object as THREE.Mesh).geometry.parameters.height;
-    const localY = e.point.y - (e.object.position.y - appHeight/2);
+    e.stopPropagation();
     
-    // Only allow dragging from the title bar area (top portion)
-    if (localY > appHeight - titleBarHeight) {
-      e.stopPropagation();
+    // Calculate relative position in the title bar
+    const localY = e.point.y - (e.object.position.y - titleBarHeight/2);
+    
+    // Only allow dragging from the title bar area
+    if (localY > 0) {
       setIsDragging(true);
       
       // Calculate the offset between the pointer position and the panel's center
@@ -109,6 +108,7 @@ const DraggableApp: React.FC<DraggableAppProps> = ({
         position={[0, height/2 - titleBarHeight/2, 0]} 
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
+        className="draggable-handle"
       >
         <boxGeometry args={[width, titleBarHeight, depth]} />
         <meshStandardMaterial color="#444444" transparent opacity={0.6} />

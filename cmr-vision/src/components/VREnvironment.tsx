@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box } from '@react-three/drei';
 import * as THREE from 'three';
 import { AppType } from '../App';
@@ -15,6 +15,23 @@ interface VREnvironmentProps {
 }
 
 const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
+  // Calculate app size based on screen aspect ratio
+  const [appSize, setAppSize] = useState<[number, number, number]>([16, 9, 0.1]);
+  
+  // Update app size when screen size changes
+  useEffect(() => {
+    const updateSize = () => {
+      const aspectRatio = window.innerWidth / window.innerHeight;
+      const width = 5; // Base width units in 3D space
+      const height = width / aspectRatio;
+      setAppSize([width, height, 0.1]);
+    };
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  
   // Store app positions to make them persist
   const [appPositions, setAppPositions] = useState<Record<string, THREE.Vector3>>({
     video: new THREE.Vector3(0, 0, -2),
@@ -35,9 +52,6 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
 
   // Render the selected app
   const renderApp = () => {
-    // App dimensions (width, height, depth)
-    const appSize: [number, number, number] = [10, 6, 0.1];
-
     if (selectedApp === 'video') {
       return (
         <DraggableApp 
@@ -101,10 +115,10 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
         size={appSize}
         onPositionChange={(pos) => handlePositionChange('welcome', pos)}
       >
-        <Box args={[10, 6, 0.1]} position={[0, 0, 0]}>
+        <Box args={appSize} position={[0, 0, 0]}>
           <meshStandardMaterial color="#007AFF" />
           <mesh position={[0, 0, 0.051]}>
-            <planeGeometry args={[10, 6]} />
+            <planeGeometry args={[appSize[0] * 0.95, appSize[1] * 0.95]} />
             <meshBasicMaterial color="#000000">
               <canvasTexture attach="map" />
             </meshBasicMaterial>

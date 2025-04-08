@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Html } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
 
 const BrowserApp: React.FC = () => {
   const [url, setUrl] = useState('https://duckduckgo.com/');
   const [searchInput, setSearchInput] = useState('');
+  const { size } = useThree();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Scale factor for the iframe - adjust as needed
+  const scaleFactor = 0.95;
+  
+  // Calculate iframe dimensions based on the canvas size
+  const width = Math.min(1600, size.width * 0.8);
+  const height = width * (9/16); // 16:9 aspect ratio
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,20 +30,46 @@ const BrowserApp: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    // Fix for iOS/Safari that might have issues with iframes in WebGL
+    const fixIframeFocus = (e: MouseEvent) => {
+      if (iframeRef.current) {
+        iframeRef.current.focus();
+      }
+    };
+    
+    document.addEventListener('click', fixIframeFocus);
+    
+    return () => {
+      document.removeEventListener('click', fixIframeFocus);
+    };
+  }, []);
+
+  // Check if running in Electron to handle browser differently
+  const isElectron = () => {
+    return typeof window !== 'undefined' && 
+           window.navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
+  };
+
   return (
     <group>
       <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
         <meshStandardMaterial color="#58b792" />
         <Html
           transform
-          distanceFactor={1.17}
+          distanceFactor={10}
           position={[0, 0, 0.06]}
+          scale={[0.025 * scaleFactor, 0.025 * scaleFactor, 0.025]}
+          occlude
+          zIndexRange={[1, 10]}
           style={{
-            width: '1600px',
-            height: '900px',
+            width: `${width}px`,
+            height: `${height}px`,
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: 'white',
+            borderRadius: '10px',
+            overflow: 'hidden',
             pointerEvents: 'auto',
           }}
         >
@@ -73,15 +109,30 @@ const BrowserApp: React.FC = () => {
               </button>
             </form>
           </div>
-          <iframe
-            title="Browser"
-            src={url}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-            }}
-          />
+          {isElectron() ? (
+            <webview 
+              src={url}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                flex: 1,
+              }}
+            ></webview>
+          ) : (
+            <iframe
+              ref={iframeRef}
+              title="Browser"
+              src={url}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                flex: 1,
+              }}
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            />
+          )}
         </Html>
       </Box>
     </group>
