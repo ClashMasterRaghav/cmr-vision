@@ -22,32 +22,38 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
-        cache: 'npm'
-        cache-dependency-path: 'cmr-vision/package-lock.json'
+    
+    - name: Cache node modules
+      uses: actions/cache@v3
+      id: npm-cache
+      with:
+        path: cmr-vision/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('cmr-vision/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
     
     - name: Install dependencies
       working-directory: ./cmr-vision
+      if: steps.npm-cache.outputs.cache-hit != 'true'
       run: npm ci
     
     - name: Build React App
       working-directory: ./cmr-vision
       run: npm run build
     
-    # You'll need to add electron-builder configuration to package.json
-    # and add a script like "electron:build": "electron-builder"
+    - name: Build Electron App
+      working-directory: ./cmr-vision
+      run: npm run electron:build
     
-    # - name: Build Electron App
-    #   working-directory: ./cmr-vision
-    #   run: npm run electron:build
-    
-    # - name: Upload Artifacts
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: ${{ matrix.os }}-build
-    #     path: |
-    #       cmr-vision/dist/*.exe
-    #       cmr-vision/dist/*.dmg
-    #       cmr-vision/dist/*.AppImage
-    #       cmr-vision/dist/*.snap
-    #       cmr-vision/dist/*.deb
-    #       cmr-vision/dist/*.rpm 
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }}-build
+        path: |
+          cmr-vision/dist/*.exe
+          cmr-vision/dist/*.dmg
+          cmr-vision/dist/*.AppImage
+          cmr-vision/dist/*.snap
+          cmr-vision/dist/*.deb
+          cmr-vision/dist/*.rpm
+        retention-days: 5 
