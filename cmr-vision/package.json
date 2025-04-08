@@ -2,6 +2,7 @@
   "name": "cmr-vision",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://clashmasterraghav.github.io/cmr-vision/",
   "main": "public/electron.js",
   "dependencies": {
     "@react-three/drei": "9.88.17",
