@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        path: 'cmr-vision'
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -25,10 +27,12 @@ jobs:
         cache-dependency-path: 'cmr-vision/package-lock.json'
     
     - name: Install dependencies
-      run: cd cmr-vision && npm ci
+      working-directory: ./cmr-vision
+      run: npm ci
     
     - name: Build
-      run: cd cmr-vision && npm run build
+      working-directory: ./cmr-vision
+      run: npm run build
       
     # Optional deployment steps
     # - name: Deploy to GitHub Pages
