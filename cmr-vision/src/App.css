@@ -41,16 +41,99 @@
 }
 
 .ui-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  bottom: 20px;
   width: 100%;
-  height: 100%;
-  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.ui-overlay * {
+.ar-mode {
+  background-color: transparent !important;
+}
+
+.ar-mode .ui-overlay {
   pointer-events: auto;
+}
+
+.mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+}
+
+.mode-button {
+  padding: 10px 20px;
+  background-color: #007AFF;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.mode-button:hover {
+  background-color: #0055cc;
+}
+
+.mode-button.active {
+  background-color: #FF3B30;
+}
+
+.mode-button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+/* Ensure the draggable handles are visible and easy to grab on mobile */
+.draggable-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.draggable-handle:active {
+  cursor: grabbing;
+}
+
+/* Make app windows more visible in AR mode */
+.ar-mode .app-window {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure fullscreen canvas in AR mode */
+.ar-mode canvas {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+}
+
+/* Make AR mode work well on mobile */
+@media (max-width: 768px) {
+  .ui-overlay {
+    bottom: 10px;
+  }
+  
+  .mode-toggle {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .mode-button {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+  
+  /* Larger touch targets for mobile */
+  .draggable-handle {
+    min-height: 30px;
+  }
 }
 
 body {
