@@ -35,8 +35,12 @@ jobs:
     
     - name: Install dependencies
       working-directory: ./cmr-vision
-      if: steps.npm-cache.outputs.cache-hit != 'true'
-      run: npm ci
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
     
     - name: Build
       working-directory: ./cmr-vision
