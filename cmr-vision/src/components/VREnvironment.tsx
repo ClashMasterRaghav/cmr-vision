@@ -7,6 +7,7 @@ import YoutubeApp from './apps/YoutubeApp';
 import GithubApp from './apps/GithubApp';
 import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
+import Environment from './Environment';
 import { ARButton } from './ARButton';
 
 interface VREnvironmentProps {
@@ -167,15 +168,8 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   return (
     <>
-      {/* Environment lighting */}
-      <ambientLight intensity={1.5} />
-      <directionalLight
-        position={[0, 5, 5]}
-        intensity={1.0}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
+      {/* Add immersive environment */}
+      <Environment />
       
       {/* Multiple app containers */}
       {renderApps()}

@@ -1,6 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-import DraggableScreen from '../DraggableScreen';
+import CurvedScreen from '../CurvedScreen';
 
 const GithubApp: React.FC = () => {
   // Define the position and scale for the screen
@@ -8,7 +8,7 @@ const GithubApp: React.FC = () => {
   const scale = 1;
   
   return (
-    <DraggableScreen 
+    <CurvedScreen 
       contentUrl="https://github.com"
       position={position}
       scale={scale}
