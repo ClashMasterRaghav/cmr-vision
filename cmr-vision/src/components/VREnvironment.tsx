@@ -7,7 +7,6 @@ import YoutubeApp from './apps/YoutubeApp';
 import GithubApp from './apps/GithubApp';
 import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
-import ARCamera from './ARCamera';
 import { ARButton } from './ARButton';
 
 interface VREnvironmentProps {
@@ -58,10 +57,27 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   const { gl } = useThree();
 
-  // Append AR button to the DOM
+  // Initialize AR with ARButton
   useEffect(() => {
-    const arButton = ARButton.createButton(gl, { optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } });
+    // Configuration for AR session
+    const sessionInit = {
+      requiredFeatures: ['hit-test'],
+      optionalFeatures: ['dom-overlay'],
+      domOverlay: { root: document.body }
+    };
+    
+    // Create and append AR button
+    const arButton = ARButton.createButton(gl, sessionInit);
     document.body.appendChild(arButton);
+
+    // Set up AR session event handlers
+    gl.xr.addEventListener('sessionstart', () => {
+      console.log('AR session started');
+    });
+    
+    gl.xr.addEventListener('sessionend', () => {
+      console.log('AR session ended');
+    });
 
     return () => {
       if (arButton && arButton.parentNode) {
@@ -96,9 +112,6 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   return (
     <>
-      {/* Camera */}
-      <ARCamera />
-      
       {/* Environment lighting */}
       <ambientLight intensity={1.5} />
       <directionalLight

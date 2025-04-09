@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Box, Html } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -11,10 +11,25 @@ interface ScreenProps {
 
 const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
   const { viewport } = useThree();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  // Standard screen dimensions
+  // Standard screen dimensions (16:9 aspect ratio)
   const width = 16;
   const height = 9;
+  
+  // Setup iframe interaction handler
+  useEffect(() => {
+    const handleIframeInteraction = () => {
+      if (iframeRef.current) {
+        iframeRef.current.focus();
+      }
+    };
+    
+    document.addEventListener('click', handleIframeInteraction);
+    return () => {
+      document.removeEventListener('click', handleIframeInteraction);
+    };
+  }, []);
   
   return (
     <group position={position} scale={[scale, scale, scale]}>
@@ -28,8 +43,8 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
           occlude
           zIndexRange={[1, 10]}
           style={{
-            width: `${viewport.width}px`,
-            height: `${viewport.height}px`,
+            width: `${1600}px`, // Fixed width for consistent website rendering
+            height: `${900}px`, // 16:9 aspect ratio
             backgroundColor: 'white',
             borderRadius: '10px',
             overflow: 'hidden',
@@ -38,6 +53,7 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
           }}
         >
           <iframe
+            ref={iframeRef}
             title="Screen Content"
             src={contentUrl}
             style={{
@@ -46,6 +62,7 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
               border: 'none'
             }}
             allowFullScreen
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
           />
         </Html>
       </Box>
