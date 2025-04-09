@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AppType } from '../App';
 import VideoApp from './apps/VideoApp';
@@ -8,6 +8,7 @@ import GithubApp from './apps/GithubApp';
 import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
 import ARCamera from './ARCamera';
+import { ARButton } from './ARButton';
 
 interface VREnvironmentProps {
   selectedApp: AppType;
@@ -32,10 +33,9 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   // Calculate viewport dimensions in 3D space
   const getViewportSize = () => {
-    // Calculate how much space is visible at z=-1
-    // Based on camera FOV and position
-    const fov = isMobile ? 80 : 60;
-    const z = -1;
+    // Set FOV to 75 for a standard 1x zoom effect
+    const fov = 75;
+    const z = -2; // Adjusted to match screen position
     const height = 2 * Math.tan((fov * Math.PI / 180) / 2) * Math.abs(z);
     const aspect = window.innerWidth / window.innerHeight;
     const width = height * aspect;
@@ -56,10 +56,23 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     }
   });
   
+  const { gl } = useThree();
+
+  // Append AR button to the DOM
+  useEffect(() => {
+    const arButton = ARButton.createButton(gl, { optionalFeatures: ['dom-overlay'], domOverlay: { root: document.body } });
+    document.body.appendChild(arButton);
+
+    return () => {
+      if (arButton && arButton.parentNode) {
+        arButton.parentNode.removeChild(arButton);
+      }
+    };
+  }, [gl]);
+  
   // Render the currently selected app in fullscreen
   const renderApp = () => {
     // Position screens further from camera to prevent clipping and improve depth perception
-    // Move from -1 to -2 units away
     const position = new THREE.Vector3(0, 0, -2);
     
     // Create a fullscreen container
