@@ -9,6 +9,7 @@ import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
 import ARCamera from './ARCamera';
 import DraggableApp from './DraggableApp';
+import { saveAppPositions, loadAppPositions } from '../utils/storage';
 
 interface VREnvironmentProps {
   selectedApp: AppType;
@@ -22,7 +23,7 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   useEffect(() => {
     const updateSize = () => {
       const aspectRatio = window.innerWidth / window.innerHeight;
-      const width = 5; // Base width units in 3D space
+      const width = 3.5; // Smaller base width units in 3D space (reduced from 5)
       const height = width / aspectRatio;
       setAppSize([width, height, 0.1]);
     };
@@ -32,22 +33,34 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
   
-  // Store app positions to make them persist
-  const [appPositions, setAppPositions] = useState<Record<string, THREE.Vector3>>({
+  // Default positions
+  const defaultPositions = {
     video: new THREE.Vector3(0, 0, -2),
     youtube: new THREE.Vector3(-2, 0, -2),
     github: new THREE.Vector3(2, 0, -2),
     maps: new THREE.Vector3(0, 1, -3),
     browser: new THREE.Vector3(0, -1, -3),
     welcome: new THREE.Vector3(0, 0, -3)
+  };
+  
+  // Load saved positions from localStorage on component mount
+  const [appPositions, setAppPositions] = useState<Record<string, THREE.Vector3>>(() => {
+    return loadAppPositions(defaultPositions);
   });
 
-  // Update position for a specific app
+  // Update position for a specific app and save to localStorage
   const handlePositionChange = (app: string, position: THREE.Vector3) => {
-    setAppPositions(prev => ({
-      ...prev,
-      [app]: position
-    }));
+    setAppPositions(prev => {
+      const newPositions = {
+        ...prev,
+        [app]: position
+      };
+      
+      // Save to localStorage using utility function
+      saveAppPositions(newPositions);
+      
+      return newPositions;
+    });
   };
 
   // Render the selected app

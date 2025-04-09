@@ -53,15 +53,21 @@ const VideoApp: React.FC = () => {
     };
   }, [gl]);
 
+  // Match the box size with the parent container size
+  const { size } = useThree();
+  const aspectRatio = 16/9;
+  const width = 3.5; // Match the smaller screen size defined in VREnvironment
+  const height = width / aspectRatio;
+
   return (
     <group>
       {videoError ? (
-        <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
+        <Box args={[width, height, 0.1]} position={[0, 0, 0]}>
           <meshBasicMaterial color="#000000" />
           <Text 
             position={[0, 0, 0.06]} 
             color="white" 
-            fontSize={0.5}
+            fontSize={0.3}
             anchorX="center"
             anchorY="middle"
           >
@@ -69,7 +75,7 @@ const VideoApp: React.FC = () => {
           </Text>
         </Box>
       ) : (
-        <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
+        <Box args={[width, height, 0.1]} position={[0, 0, 0]}>
           <meshBasicMaterial attach="material">
             {textureRef.current && <videoTexture attach="map" args={[videoRef.current!]} />}
           </meshBasicMaterial>
@@ -77,7 +83,7 @@ const VideoApp: React.FC = () => {
       )}
       
       {/* Video controls */}
-      <Box args={[16, 1, 0.1]} position={[0, -5, 0]}>
+      <Box args={[width, height/9, 0.1]} position={[0, -height/2 - height/18, 0]}>
         <meshStandardMaterial color="#222222" />
       </Box>
     </group>

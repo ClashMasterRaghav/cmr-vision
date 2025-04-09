@@ -8,11 +8,11 @@ const BrowserApp: React.FC = () => {
   const { size } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  // Scale factor for the iframe - adjust as needed
-  const scaleFactor = 0.95;
+  // Scale factor for the iframe - increased for better visibility on smaller screens
+  const scaleFactor = 1.1;
   
   // Calculate iframe dimensions based on the canvas size
-  const width = Math.min(1600, size.width * 0.8);
+  const width = Math.min(1200, size.width * 0.7);
   const height = width * (9/16); // 16:9 aspect ratio
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,7 +57,7 @@ const BrowserApp: React.FC = () => {
         <meshStandardMaterial color="#58b792" />
         <Html
           transform
-          distanceFactor={10}
+          distanceFactor={12} // Adjusted for better scale in smaller window
           position={[0, 0, 0.06]}
           scale={[0.025 * scaleFactor, 0.025 * scaleFactor, 0.025]}
           occlude
@@ -71,10 +71,11 @@ const BrowserApp: React.FC = () => {
             borderRadius: '10px',
             overflow: 'hidden',
             pointerEvents: 'auto',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
           }}
         >
           <div style={{ 
-            padding: '10px', 
+            padding: '8px', 
             backgroundColor: '#f7f7f7', 
             borderBottom: '1px solid #ddd',
             display: 'flex'
@@ -87,8 +88,8 @@ const BrowserApp: React.FC = () => {
                 placeholder="Search or enter website name"
                 style={{
                   flex: 1,
-                  padding: '8px 12px',
-                  fontSize: '16px',
+                  padding: '6px 10px',
+                  fontSize: '14px',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                 }}
@@ -96,13 +97,14 @@ const BrowserApp: React.FC = () => {
               <button
                 type="submit"
                 style={{
-                  marginLeft: '10px',
-                  padding: '8px 16px',
+                  marginLeft: '8px',
+                  padding: '6px 12px',
                   backgroundColor: '#58b792',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
+                  fontSize: '14px'
                 }}
               >
                 Go
@@ -129,6 +131,7 @@ const BrowserApp: React.FC = () => {
                 height: '100%',
                 border: 'none',
                 flex: 1,
+                backgroundColor: 'white'
               }}
               sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
             />
