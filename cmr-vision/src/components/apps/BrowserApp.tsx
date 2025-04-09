@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Html } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+
+// Standard screen dimensions to match VREnvironment
+const SCREEN_WIDTH = 1.0;
+const SCREEN_HEIGHT = 0.75; 
 
 const BrowserApp: React.FC = () => {
   const [url, setUrl] = useState('https://duckduckgo.com/');
@@ -8,12 +13,15 @@ const BrowserApp: React.FC = () => {
   const { size } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  // Scale factor for the iframe - increased for better mobile visibility 
-  const scaleFactor = 1.3;
+  // Scale factor for the iframe - optimized for readability
+  const scaleFactor = 1.5;
   
-  // Calculate iframe dimensions based on the canvas size
+  // Calculate iframe dimensions based on standard size
   const width = Math.min(800, size.width * 0.8);
   const height = width * (9/16); // 16:9 aspect ratio
+  
+  // Add shadow to browser frame
+  const shadowRef = useRef<THREE.Mesh>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,21 +62,44 @@ const BrowserApp: React.FC = () => {
   // Get app size based on screen size
   const getAppSize = () => {
     // Mobile optimized smaller size
-    if (window.innerWidth < 768) {
-      return [2.5, 2.5 / (16/9), 0.05] as [number, number, number];
-    }
-    return [3.5, 3.5 / (16/9), 0.05] as [number, number, number];
+    const isMobile = window.innerWidth < 768;
+    const scale = isMobile ? 0.8 : 1.0;
+    
+    return [
+      SCREEN_WIDTH * scale, 
+      SCREEN_HEIGHT * scale, 
+      0.05
+    ] as [number, number, number];
   };
 
   const appSize = getAppSize();
+  
+  // Apply subtle animation to the content
+  useEffect(() => {
+    const animate = () => {
+      if (shadowRef.current) {
+        shadowRef.current.position.z = -0.06 + Math.sin(Date.now() * 0.001) * 0.01;
+      }
+      requestAnimationFrame(animate);
+    };
+    
+    animate();
+  }, []);
 
   return (
     <group>
+      {/* Browser window background with shadow */}
+      <mesh ref={shadowRef} position={[0, 0, -0.06]} castShadow receiveShadow>
+        <boxGeometry args={[appSize[0] + 0.05, appSize[1] + 0.05, 0.01]} />
+        <meshStandardMaterial color="#000000" transparent opacity={0.3} />
+      </mesh>
+      
+      {/* Main box with appealing color */}
       <Box args={appSize} position={[0, 0, 0]}>
         <meshStandardMaterial color="#58b792" />
         <Html
           transform
-          distanceFactor={10}
+          distanceFactor={12}
           position={[0, 0, 0.06]}
           scale={[0.025 * scaleFactor, 0.025 * scaleFactor, 0.025]}
           occlude
@@ -82,7 +113,7 @@ const BrowserApp: React.FC = () => {
             borderRadius: '8px',
             overflow: 'hidden',
             pointerEvents: 'auto',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
           }}
         >
           <div style={{ 
@@ -149,6 +180,12 @@ const BrowserApp: React.FC = () => {
           )}
         </Html>
       </Box>
+      
+      {/* Title bar with styles similar to sample code */}
+      <mesh position={[0, appSize[1]/2 - 0.03, 0.051]}>
+        <planeGeometry args={[appSize[0], 0.06]} />
+        <meshStandardMaterial color="#444444" transparent opacity={0.8} />
+      </mesh>
     </group>
   );
 };
