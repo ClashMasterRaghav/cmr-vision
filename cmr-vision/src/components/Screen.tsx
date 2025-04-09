@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Box, Html } from '@react-three/drei';
-import { useThree } from '@react-three/fiber';
+import { useThree, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface ScreenProps {
@@ -54,7 +54,7 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
           }}
           // Stop propagation to prevent click from going through to background
-          onClick={(e: React.MouseEvent) => {
+          onClick={(e: ThreeEvent<MouseEvent>) => {
             e.stopPropagation();
           }}
         >

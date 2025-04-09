@@ -102,7 +102,7 @@ const DraggableScreen: React.FC<DraggableScreenProps> = ({
         {onClose && (
           <mesh 
             position={[width/2 - 0.5, 0, 0.1]} 
-            onClick={(e) => {
+            onClick={(e: ThreeEvent<MouseEvent>) => {
               e.stopPropagation();
               onClose();
             }}
