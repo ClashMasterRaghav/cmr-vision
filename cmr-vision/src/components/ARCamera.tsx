@@ -7,7 +7,7 @@ const ARCamera: React.FC = () => {
   const { camera } = useThree();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   
-  // Setup camera access for background video only
+  // Setup camera access for background video
   useEffect(() => {
     if (!videoRef.current) {
       videoRef.current = document.createElement('video');
@@ -54,40 +54,39 @@ const ARCamera: React.FC = () => {
     };
   }, []);
 
-  // Set the camera to a fixed position - similar to sample code
+  // Better mobile camera positioning
   useEffect(() => {
-    if (camera && camera instanceof THREE.PerspectiveCamera) {
-      // Position directly in front of screens
-      camera.position.set(0, 0, 1.5);
-      camera.lookAt(0, 0, 0);
+    if (camera instanceof THREE.PerspectiveCamera) {
+      // Mobile-first camera positioning
+      const isMobile = window.innerWidth < 768;
       
-      // Make camera updates less abrupt
-      const smoothlyUpdateCamera = () => {
-        if (camera instanceof THREE.PerspectiveCamera) {
-          // Calculate aspect ratio
-          camera.aspect = window.innerWidth / window.innerHeight;
-          
-          // Adjust FOV based on device
-          const isMobile = window.innerWidth < 768;
-          camera.fov = isMobile ? 75 : 65; // Wider FOV on mobile
-          
-          camera.updateProjectionMatrix();
-        }
+      // Position camera for optimal viewing
+      camera.position.set(0, 0, isMobile ? 0.5 : 1.0);
+      camera.lookAt(0, 0, -1);
+      
+      // Mobile-optimized FOV
+      camera.fov = isMobile ? 80 : 60;
+      camera.updateProjectionMatrix();
+      
+      // Handle window resizing
+      const handleResize = () => {
+        const newIsMobile = window.innerWidth < 768;
+        camera.fov = newIsMobile ? 80 : 60;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.position.z = newIsMobile ? 0.5 : 1.0;
+        camera.updateProjectionMatrix();
       };
       
-      // Update camera on window resize
-      window.addEventListener('resize', smoothlyUpdateCamera);
-      smoothlyUpdateCamera(); // Initial update
-      
-      return () => window.removeEventListener('resize', smoothlyUpdateCamera);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
     }
   }, [camera]);
 
   return (
     <PerspectiveCamera 
       makeDefault 
-      position={[0, 0, 1.5]} 
-      fov={window.innerWidth < 768 ? 75 : 65}
+      position={[0, 0, window.innerWidth < 768 ? 0.5 : 1.0]} 
+      fov={window.innerWidth < 768 ? 80 : 60}
       near={0.1}
       far={1000}
       aspect={window.innerWidth / window.innerHeight}
