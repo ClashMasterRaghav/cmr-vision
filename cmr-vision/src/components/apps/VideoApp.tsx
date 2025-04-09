@@ -15,17 +15,18 @@ const VideoApp: React.FC<VideoAppProps> = ({ viewportSize }) => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
   
-  // Calculate aspect-correct dimensions
+  // Calculate aspect-correct dimensions, but slightly smaller to not cover UI
   const { width, height } = viewportSize;
   const videoAspect = 16/9; // Standard video aspect ratio
   
   // Calculate dimensions that maintain aspect ratio and fill the viewport
-  let videoWidth = width * 0.95;
+  // Reduce to 80% of width to leave room for UI
+  let videoWidth = width * 0.8;
   let videoHeight = videoWidth / videoAspect;
   
   // If video is too tall, scale by height instead
-  if (videoHeight > height * 0.95) {
-    videoHeight = height * 0.95;
+  if (videoHeight > height * 0.8) {
+    videoHeight = height * 0.8;
     videoWidth = videoHeight * videoAspect;
   }
   
@@ -68,7 +69,10 @@ const VideoApp: React.FC<VideoAppProps> = ({ viewportSize }) => {
   }, []);
   
   // Handle play/pause toggle
-  const togglePlayback = () => {
+  const togglePlayback = (e: THREE.Event) => {
+    // Stop propagation to prevent clicking through to background
+    e.stopPropagation();
+    
     if (!videoRef.current) return;
     
     if (playing) {
@@ -116,7 +120,7 @@ const VideoApp: React.FC<VideoAppProps> = ({ viewportSize }) => {
         
         {/* Play/Pause indicator */}
         {!playing && (
-          <mesh position={[0, 0, 0.01]}>
+          <mesh position={[0, 0, 0.01]} onClick={togglePlayback}>
             <planeGeometry args={[videoHeight * 0.2, videoHeight * 0.2]} />
             <meshBasicMaterial transparent opacity={0.7} color="#FFFFFF" />
           </mesh>

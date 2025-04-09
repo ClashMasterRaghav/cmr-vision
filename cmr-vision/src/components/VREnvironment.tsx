@@ -17,8 +17,21 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   // Reference to the active app container
   const appRef = useRef<THREE.Group>(null);
   
+  // Track active apps
+  const [activeApps, setActiveApps] = useState<AppType[]>([]);
+  
   // Store whether we're on mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  // Track AR mode state
+  const [isARMode, setIsARMode] = useState(false);
+  
+  // Update active apps when selected app changes
+  useEffect(() => {
+    if (selectedApp && !activeApps.includes(selectedApp)) {
+      setActiveApps(prev => [...prev, selectedApp]);
+    }
+  }, [selectedApp, activeApps]);
   
   // Detect device type and update on resize
   useEffect(() => {
@@ -59,11 +72,21 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
 
   // Initialize AR with ARButton
   useEffect(() => {
+    // Create a DOM overlay container that persists in AR mode
+    const arOverlay = document.createElement('div');
+    arOverlay.style.position = 'absolute';
+    arOverlay.style.bottom = '20px';
+    arOverlay.style.left = '0';
+    arOverlay.style.width = '100%';
+    arOverlay.style.zIndex = '1000';
+    arOverlay.style.pointerEvents = 'auto';
+    document.body.appendChild(arOverlay);
+    
     // Configuration for AR session
     const sessionInit = {
       requiredFeatures: ['hit-test'],
       optionalFeatures: ['dom-overlay'],
-      domOverlay: { root: document.body }
+      domOverlay: { root: document.body } // This ensures UI stays visible
     };
     
     // Create and append AR button
@@ -73,41 +96,70 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     // Set up AR session event handlers
     gl.xr.addEventListener('sessionstart', () => {
       console.log('AR session started');
+      setIsARMode(true);
+      
+      // Clone the UI overlay into the AR overlay to ensure visibility
+      const uiOverlay = document.querySelector('.ui-overlay');
+      if (uiOverlay) {
+        arOverlay.appendChild(uiOverlay.cloneNode(true));
+      }
     });
     
     gl.xr.addEventListener('sessionend', () => {
       console.log('AR session ended');
+      setIsARMode(false);
+      
+      // Clean up cloned UI
+      arOverlay.innerHTML = '';
     });
 
     return () => {
       if (arButton && arButton.parentNode) {
         arButton.parentNode.removeChild(arButton);
       }
+      if (arOverlay && arOverlay.parentNode) {
+        arOverlay.parentNode.removeChild(arOverlay);
+      }
     };
   }, [gl]);
   
-  // Render the currently selected app in fullscreen
-  const renderApp = () => {
-    // Position screens further from camera to prevent clipping and improve depth perception
-    const position = new THREE.Vector3(0, 0, -2);
-    
-    // Create a fullscreen container
-    const appContainer = (
-      <group 
-        ref={appRef}
-        position={position}
-        userData={{ appType: selectedApp }}
-      >
-        {selectedApp === 'video' && <VideoApp viewportSize={viewport} />}
-        {selectedApp === 'youtube' && <YoutubeApp />}
-        {selectedApp === 'github' && <GithubApp />}
-        {selectedApp === 'maps' && <MapsApp />}
-        {selectedApp === 'browser' && <BrowserApp />}
-        {selectedApp === 'welcome' && <WelcomeScreen viewportSize={viewport} />}
+  // Close app handler
+  const handleCloseApp = (appType: AppType) => {
+    setActiveApps(prev => prev.filter(app => app !== appType));
+  };
+  
+  // Render active apps
+  const renderApps = () => {
+    return (
+      <group ref={appRef}>
+        {activeApps.map((appType, index) => {
+          // Calculate position for each app in a grid or row
+          // For simplicity, let's arrange them in a row
+          const xOffset = activeApps.length > 1 ? (index - (activeApps.length - 1) / 2) * 15 : 0;
+          const position = new THREE.Vector3(xOffset, 0, -2);
+          
+          return (
+            <group key={appType} position={position} userData={{ appType }}>
+              {appType === 'video' && <VideoApp viewportSize={viewport} />}
+              {appType === 'youtube' && <YoutubeApp />}
+              {appType === 'github' && <GithubApp />}
+              {appType === 'maps' && <MapsApp />}
+              {appType === 'browser' && <BrowserApp />}
+              {appType === 'welcome' && <WelcomeScreen viewportSize={viewport} onClose={() => handleCloseApp('welcome')} />}
+              
+              {/* Close button for each app */}
+              <mesh 
+                position={[7, 4, 0.1]} 
+                onClick={() => handleCloseApp(appType)}
+              >
+                <planeGeometry args={[0.8, 0.8]} />
+                <meshBasicMaterial color="red" transparent opacity={0.8} />
+              </mesh>
+            </group>
+          );
+        })}
       </group>
     );
-    
-    return appContainer;
   };
   
   return (
@@ -122,14 +174,17 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
         shadow-mapSize-height={1024}
       />
       
-      {/* App container */}
-      {renderApp()}
+      {/* Multiple app containers */}
+      {renderApps()}
     </>
   );
 };
 
 // Simple welcome screen when no app is selected
-const WelcomeScreen: React.FC<{ viewportSize: { width: number, height: number } }> = ({ viewportSize }) => {
+const WelcomeScreen: React.FC<{ 
+  viewportSize: { width: number, height: number },
+  onClose: () => void 
+}> = ({ viewportSize, onClose }) => {
   const { width, height } = viewportSize;
   const scale = Math.min(0.9, width / 2);
   

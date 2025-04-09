@@ -15,7 +15,14 @@ function App() {
         <VREnvironment selectedApp={selectedApp} />
       </Canvas>
       
-      <div className="ui-overlay">
+      <div className="ui-overlay" style={{ 
+        position: 'absolute', 
+        bottom: '20px', 
+        left: '0', 
+        width: '100%', 
+        zIndex: 1000, 
+        pointerEvents: 'auto'
+      }}>
         <AppSelector onSelectApp={setSelectedApp} selectedApp={selectedApp} />
       </div>
     </div>

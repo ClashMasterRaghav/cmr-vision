@@ -14,12 +14,14 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
   // Standard screen dimensions (16:9 aspect ratio)
-  const width = 16;
-  const height = 9;
+  // Reduced size to avoid covering UI elements
+  const width = 14; // Reduced from 16
+  const height = 7.875; // Reduced from 9, maintaining aspect ratio
   
   // Setup iframe interaction handler
   useEffect(() => {
-    const handleIframeInteraction = () => {
+    const handleIframeInteraction = (e: MouseEvent) => {
+      // Only focus the iframe if the click is within the screen area
       if (iframeRef.current) {
         iframeRef.current.focus();
       }
@@ -50,6 +52,10 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
             overflow: 'hidden',
             pointerEvents: 'auto',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}
+          // Stop propagation to prevent click from going through to background
+          onClick={(e) => {
+            e.stopPropagation();
           }}
         >
           <iframe
