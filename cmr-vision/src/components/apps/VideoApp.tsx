@@ -48,7 +48,7 @@ const VideoApp: React.FC<VideoAppProps> = ({ viewportSize }) => {
       const texture = new THREE.VideoTexture(video);
       texture.minFilter = THREE.LinearFilter;
       texture.magFilter = THREE.LinearFilter;
-      texture.format = THREE.RGBFormat;
+      texture.format = THREE.RGBAFormat;
       
       videoTextureRef.current = texture;
       setVideoLoaded(true);
