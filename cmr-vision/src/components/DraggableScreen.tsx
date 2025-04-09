@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useThree, useFrame, ThreeEvent } from '@react-three/fiber';
 import { Box, Html, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import Screen from './Screen';
@@ -45,7 +45,7 @@ const DraggableScreen: React.FC<DraggableScreenProps> = ({
   }, [camera, mouse]);
   
   // Handle drag start
-  const handleDragStart = useCallback((e: THREE.Event) => {
+  const handleDragStart = useCallback((e: ThreeEvent<MouseEvent | TouchEvent>) => {
     e.stopPropagation();
     if (group.current) {
       setIsDragging(true);

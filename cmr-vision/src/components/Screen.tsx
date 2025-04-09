@@ -54,7 +54,7 @@ const Screen: React.FC<ScreenProps> = ({ contentUrl, position, scale }) => {
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
           }}
           // Stop propagation to prevent click from going through to background
-          onClick={(e) => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
           }}
         >

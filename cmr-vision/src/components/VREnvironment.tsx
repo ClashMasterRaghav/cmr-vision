@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AppType } from '../App';
 import VideoApp from './apps/VideoApp';
@@ -150,7 +150,10 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
               {/* Close button for each app */}
               <mesh 
                 position={[7, 4, 0.1]} 
-                onClick={() => handleCloseApp(appType)}
+                onClick={(e: ThreeEvent<MouseEvent>) => {
+                  e.stopPropagation();
+                  handleCloseApp(appType);
+                }}
               >
                 <planeGeometry args={[0.8, 0.8]} />
                 <meshBasicMaterial color="red" transparent opacity={0.8} />

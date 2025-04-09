@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import { ThreeEvent } from '@react-three/fiber';
 
 interface VideoAppProps {
   viewportSize: {
@@ -69,7 +70,7 @@ const VideoApp: React.FC<VideoAppProps> = ({ viewportSize }) => {
   }, []);
   
   // Handle play/pause toggle
-  const togglePlayback = (e: THREE.Event) => {
+  const togglePlayback = (e: ThreeEvent<MouseEvent>) => {
     // Stop propagation to prevent clicking through to background
     e.stopPropagation();
     
