@@ -7,7 +7,6 @@ import YoutubeApp from './apps/YoutubeApp';
 import GithubApp from './apps/GithubApp';
 import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
-import Environment from './Environment';
 import { ARButton } from './ARButton';
 
 interface VREnvironmentProps {
@@ -58,14 +57,14 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   const viewport = getViewportSize();
   
-  // Subtle floating animation
+  // Subtle floating animation - more pronounced to make screens float visibly
   useFrame(({ clock }) => {
     if (appRef.current) {
       const t = clock.getElapsedTime();
-      // Very subtle movement - barely noticeable but adds life
-      appRef.current.position.y = Math.sin(t * 0.5) * 0.01;
-      // Subtle rotation
-      appRef.current.rotation.z = Math.sin(t * 0.3) * 0.005;
+      // More noticeable floating movement
+      appRef.current.position.y = Math.sin(t * 0.3) * 0.05;
+      // Gentle swaying rotation
+      appRef.current.rotation.z = Math.sin(t * 0.2) * 0.01;
     }
   });
   
@@ -86,7 +85,7 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     // Configuration for AR session
     const sessionInit = {
       requiredFeatures: ['hit-test'],
-      optionalFeatures: ['dom-overlay'],
+      optionalFeatures: ['dom-overlay', 'camera-access'],
       domOverlay: { root: document.body } // This ensures UI stays visible
     };
     
@@ -104,6 +103,9 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
       if (uiOverlay) {
         arOverlay.appendChild(uiOverlay.cloneNode(true));
       }
+      
+      // Dispatch custom event for App component
+      window.dispatchEvent(new CustomEvent('ar-session-start'));
     });
     
     gl.xr.addEventListener('sessionend', () => {
@@ -112,6 +114,9 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
       
       // Clean up cloned UI
       arOverlay.innerHTML = '';
+      
+      // Dispatch custom event for App component
+      window.dispatchEvent(new CustomEvent('ar-session-end'));
     });
 
     return () => {
@@ -135,9 +140,14 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
       <group ref={appRef}>
         {activeApps.map((appType, index) => {
           // Calculate position for each app in a grid or row
-          // For simplicity, let's arrange them in a row
-          const xOffset = activeApps.length > 1 ? (index - (activeApps.length - 1) / 2) * 15 : 0;
-          const position = new THREE.Vector3(xOffset, 0, -2);
+          // Position screens in a semi-circle in front of the user
+          const angle = (activeApps.length > 1) 
+            ? -Math.PI/4 + (index/(activeApps.length-1)) * Math.PI/2 
+            : 0;
+          const distance = 2;
+          const xPos = Math.sin(angle) * distance;
+          const zPos = -Math.cos(angle) * distance;
+          const position = new THREE.Vector3(xPos, 0.2, zPos); // Slight lift for floating effect
           
           return (
             <group key={`app-${index}-${String(appType)}`} position={position} userData={{ appType }}>
@@ -168,8 +178,15 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   return (
     <>
-      {/* Add immersive environment */}
-      <Environment />
+      {/* Environment lighting */}
+      <ambientLight intensity={1.5} />
+      <directionalLight
+        position={[0, 5, 5]}
+        intensity={1.0}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
       
       {/* Multiple app containers */}
       {renderApps()}

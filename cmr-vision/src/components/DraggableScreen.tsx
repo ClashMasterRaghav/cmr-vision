@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { useThree, useFrame, ThreeEvent } from '@react-three/fiber';
-import { Box, Html, useCursor } from '@react-three/drei';
+import { Html, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import Screen from './Screen';
 
@@ -29,7 +29,7 @@ const DraggableScreen: React.FC<DraggableScreenProps> = ({
   useCursor(hover);
   
   // For dragging calculations
-  const { camera, mouse, viewport } = useThree();
+  const { camera, mouse } = useThree();
   
   // Standard screen dimensions (16:9 aspect ratio)
   const width = 14;
@@ -75,24 +75,26 @@ const DraggableScreen: React.FC<DraggableScreenProps> = ({
     <group ref={group} position={position} scale={[scale, scale, scale]}>
       {/* Title bar (draggable) */}
       <mesh 
-        position={[0, height/2 + 0.4, 0]} 
+        position={[0, height/2 + 0.3, 0]} 
         onPointerDown={handleDragStart}
         onPointerUp={handleDragEnd}
         onPointerLeave={handleDragEnd}
         onPointerOver={() => setHover(true)}
         onPointerOut={() => setHover(false)}
       >
-        <planeGeometry args={[width, 0.8]} />
-        <meshStandardMaterial color="#0066AA" />
+        <planeGeometry args={[width, 0.6]} />
+        <meshStandardMaterial color={isDragging ? "#1E90FF" : "#4285F4"} />
         <Html
-          position={[0, 0, 0.1]}
+          position={[0, 0, 0.01]}
           center
           style={{
             color: 'white',
             fontSize: '16px',
             fontWeight: 'bold',
             userSelect: 'none',
-            cursor: isDragging ? 'grabbing' : hover ? 'grab' : 'auto'
+            cursor: isDragging ? 'grabbing' : hover ? 'grab' : 'auto',
+            width: '100%',
+            textAlign: 'center'
           }}
         >
           {title}
@@ -101,7 +103,7 @@ const DraggableScreen: React.FC<DraggableScreenProps> = ({
         {/* Close button */}
         {onClose && (
           <mesh 
-            position={[width/2 - 0.5, 0, 0.1]} 
+            position={[width/2 - 0.4, 0, 0.01]} 
             onClick={(e: ThreeEvent<MouseEvent>) => {
               e.stopPropagation();
               onClose();
@@ -109,10 +111,28 @@ const DraggableScreen: React.FC<DraggableScreenProps> = ({
             onPointerOver={() => setHover(true)}
             onPointerOut={() => setHover(false)}
           >
-            <planeGeometry args={[0.6, 0.6]} />
-            <meshBasicMaterial color="red" transparent opacity={0.8} />
+            <planeGeometry args={[0.4, 0.4]} />
+            <meshBasicMaterial color="#FF5252" />
+            <Html
+              position={[0, 0, 0.01]}
+              center
+              style={{
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                userSelect: 'none'
+              }}
+            >
+              ✕
+            </Html>
           </mesh>
         )}
+      </mesh>
+      
+      {/* Screen shadow for better depth perception */}
+      <mesh position={[0, 0, -0.1]} rotation={[0, 0, 0]}>
+        <planeGeometry args={[width + 0.2, height + 0.2]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.2} />
       </mesh>
       
       {/* Screen content */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as THREE from 'three';
-import CurvedScreen from '../CurvedScreen';
+import DraggableScreen from '../DraggableScreen';
 
 const BrowserApp: React.FC = () => {
   const [url, setUrl] = useState('https://duckduckgo.com/');
@@ -10,7 +10,7 @@ const BrowserApp: React.FC = () => {
   const scale = 1;
   
   return (
-    <CurvedScreen 
+    <DraggableScreen 
       contentUrl={url}
       position={position}
       scale={scale}
