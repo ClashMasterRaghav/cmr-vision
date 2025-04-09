@@ -53,21 +53,27 @@ const VideoApp: React.FC = () => {
     };
   }, [gl]);
 
-  // Match the box size with the parent container size
-  const { size } = useThree();
-  const aspectRatio = 16/9;
-  const width = 3.5; // Match the smaller screen size defined in VREnvironment
-  const height = width / aspectRatio;
+  // Get app size based on screen size
+  const getAppSize = () => {
+    // Mobile optimized smaller size
+    if (window.innerWidth < 768) {
+      return [2.5, 2.5 / (16/9), 0.05] as [number, number, number];
+    }
+    return [3.5, 3.5 / (16/9), 0.05] as [number, number, number];
+  };
+
+  const appSize = getAppSize();
+  const [width, height, depth] = appSize;
 
   return (
     <group>
       {videoError ? (
-        <Box args={[width, height, 0.1]} position={[0, 0, 0]}>
+        <Box args={appSize} position={[0, 0, 0]}>
           <meshBasicMaterial color="#000000" />
           <Text 
             position={[0, 0, 0.06]} 
             color="white" 
-            fontSize={0.3}
+            fontSize={0.2}
             anchorX="center"
             anchorY="middle"
           >
@@ -75,15 +81,15 @@ const VideoApp: React.FC = () => {
           </Text>
         </Box>
       ) : (
-        <Box args={[width, height, 0.1]} position={[0, 0, 0]}>
+        <Box args={appSize} position={[0, 0, 0]}>
           <meshBasicMaterial attach="material">
             {textureRef.current && <videoTexture attach="map" args={[videoRef.current!]} />}
           </meshBasicMaterial>
         </Box>
       )}
       
-      {/* Video controls */}
-      <Box args={[width, height/9, 0.1]} position={[0, -height/2 - height/18, 0]}>
+      {/* Video controls - smaller for mobile */}
+      <Box args={[width, height/12, depth]} position={[0, -height/2 - height/24, 0]}>
         <meshStandardMaterial color="#222222" />
       </Box>
     </group>

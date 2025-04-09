@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -75,10 +75,8 @@ const ARCamera: React.FC = () => {
     };
   }, []);
 
-  // Setup camera access
+  // Setup camera access for background video only
   useEffect(() => {
-    if (!hasPermission) return;
-
     if (!videoRef.current) {
       videoRef.current = document.createElement('video');
       videoRef.current.style.position = 'fixed';
@@ -105,6 +103,7 @@ const ARCamera: React.FC = () => {
           videoRef.current.play().catch(err => {
             console.error('Error playing video:', err);
           });
+          setHasPermission(true);
         }
       })
       .catch(error => {
@@ -122,10 +121,28 @@ const ARCamera: React.FC = () => {
         videoRef.current = null;
       }
     };
-  }, [hasPermission]);
+  }, []);
+
+  // Set the camera to a fixed position for better mobile viewing
+  useEffect(() => {
+    if (camera) {
+      // Position the camera at a fixed point looking at the content
+      camera.position.set(0, 0, 4); // Pulled back to see more content
+      camera.lookAt(0, 0, 0);
+      
+      // Updating aspect ratio when window size changes
+      const handleResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      };
+      
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, [camera]);
 
   // Update camera rotation based on device orientation
-  useFrame(() => {
+  useEffect(() => {
     if (!hasPermission) return;
 
     // Convert orientation data to radians
@@ -142,13 +159,15 @@ const ARCamera: React.FC = () => {
     
     // Apply to camera
     camera.quaternion.copy(quaternion);
-  });
+  }, [hasPermission, camera]);
 
   return (
     <PerspectiveCamera 
       makeDefault 
-      position={[0, 1.6, 0]} // Typical human eye height
-      fov={75} 
+      position={[0, 0, 4]} // Set back to see all content
+      fov={85} // Wider FOV to see more content on mobile
+      near={0.1}
+      far={1000}
     />
   );
 };

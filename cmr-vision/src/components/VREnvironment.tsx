@@ -8,24 +8,26 @@ import GithubApp from './apps/GithubApp';
 import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
 import ARCamera from './ARCamera';
-import DraggableApp from './DraggableApp';
-import { saveAppPositions, loadAppPositions } from '../utils/storage';
 
 interface VREnvironmentProps {
   selectedApp: AppType;
 }
 
 const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
-  // Calculate app size based on screen aspect ratio
-  const [appSize, setAppSize] = useState<[number, number, number]>([16, 9, 0.1]);
+  // Calculate app size based on screen aspect ratio - smaller for mobile
+  const [appSize, setAppSize] = useState<[number, number, number]>([2, 1.5, 0.05]);
   
   // Update app size when screen size changes
   useEffect(() => {
     const updateSize = () => {
+      // Get aspect ratio to maintain proper dimensions
       const aspectRatio = window.innerWidth / window.innerHeight;
-      const width = 3.5; // Smaller base width units in 3D space (reduced from 5)
+      
+      // Mobile-optimized smaller width
+      const width = window.innerWidth < 768 ? 2.5 : 3;
       const height = width / aspectRatio;
-      setAppSize([width, height, 0.1]);
+      
+      setAppSize([width, height, 0.05]);
     };
     
     updateSize();
@@ -33,101 +35,57 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
   
-  // Default positions
-  const defaultPositions = {
-    video: new THREE.Vector3(0, 0, -2),
-    youtube: new THREE.Vector3(-2, 0, -2),
-    github: new THREE.Vector3(2, 0, -2),
-    maps: new THREE.Vector3(0, 1, -3),
-    browser: new THREE.Vector3(0, -1, -3),
-    welcome: new THREE.Vector3(0, 0, -3)
-  };
-  
-  // Load saved positions from localStorage on component mount
-  const [appPositions, setAppPositions] = useState<Record<string, THREE.Vector3>>(() => {
-    return loadAppPositions(defaultPositions);
-  });
-
-  // Update position for a specific app and save to localStorage
-  const handlePositionChange = (app: string, position: THREE.Vector3) => {
-    setAppPositions(prev => {
-      const newPositions = {
-        ...prev,
-        [app]: position
-      };
-      
-      // Save to localStorage using utility function
-      saveAppPositions(newPositions);
-      
-      return newPositions;
-    });
+  // Define static fixed positions for each app
+  const appPositions = {
+    video: new THREE.Vector3(0, 0.8, 0),
+    browser: new THREE.Vector3(0, -0.8, 0),
+    youtube: new THREE.Vector3(0, 0.8, 0),
+    github: new THREE.Vector3(0, 0.8, 0),
+    maps: new THREE.Vector3(0, 0.8, 0),
+    welcome: new THREE.Vector3(0, 0, 0)
   };
 
   // Render the selected app
   const renderApp = () => {
     if (selectedApp === 'video') {
       return (
-        <DraggableApp 
-          position={appPositions.video}
-          size={appSize}
-          onPositionChange={(pos) => handlePositionChange('video', pos)}
-        >
+        <group position={appPositions.video}>
           <VideoApp />
-        </DraggableApp>
+        </group>
       );
     }
     if (selectedApp === 'youtube') {
       return (
-        <DraggableApp 
-          position={appPositions.youtube}
-          size={appSize}
-          onPositionChange={(pos) => handlePositionChange('youtube', pos)}
-        >
+        <group position={appPositions.youtube}>
           <YoutubeApp />
-        </DraggableApp>
+        </group>
       );
     }
     if (selectedApp === 'github') {
       return (
-        <DraggableApp 
-          position={appPositions.github}
-          size={appSize}
-          onPositionChange={(pos) => handlePositionChange('github', pos)}
-        >
+        <group position={appPositions.github}>
           <GithubApp />
-        </DraggableApp>
+        </group>
       );
     }
     if (selectedApp === 'maps') {
       return (
-        <DraggableApp 
-          position={appPositions.maps}
-          size={appSize}
-          onPositionChange={(pos) => handlePositionChange('maps', pos)}
-        >
+        <group position={appPositions.maps}>
           <MapsApp />
-        </DraggableApp>
+        </group>
       );
     }
     if (selectedApp === 'browser') {
       return (
-        <DraggableApp 
-          position={appPositions.browser}
-          size={appSize}
-          onPositionChange={(pos) => handlePositionChange('browser', pos)}
-        >
+        <group position={appPositions.browser}>
           <BrowserApp />
-        </DraggableApp>
+        </group>
       );
     }
     
     // Welcome screen when no app is selected
     return (
-      <DraggableApp 
-        position={appPositions.welcome}
-        size={appSize}
-        onPositionChange={(pos) => handlePositionChange('welcome', pos)}
-      >
+      <group position={appPositions.welcome}>
         <Box args={appSize} position={[0, 0, 0]}>
           <meshStandardMaterial color="#007AFF" />
           <mesh position={[0, 0, 0.051]}>
@@ -137,17 +95,17 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
             </meshBasicMaterial>
           </mesh>
         </Box>
-      </DraggableApp>
+      </group>
     );
   };
 
   return (
     <>
-      {/* AR Camera that follows device orientation */}
+      {/* Static camera that looks at the content */}
       <ARCamera />
       
       {/* Environment lighting */}
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.8} />
       <directionalLight position={[0, 5, 5]} intensity={1} castShadow />
       
       {/* Render the selected app */}

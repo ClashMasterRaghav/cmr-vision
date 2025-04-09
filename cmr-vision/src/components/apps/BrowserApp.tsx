@@ -8,11 +8,11 @@ const BrowserApp: React.FC = () => {
   const { size } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  // Scale factor for the iframe - increased for better visibility on smaller screens
-  const scaleFactor = 1.1;
+  // Scale factor for the iframe - increased for better mobile visibility 
+  const scaleFactor = 1.3;
   
   // Calculate iframe dimensions based on the canvas size
-  const width = Math.min(1200, size.width * 0.7);
+  const width = Math.min(800, size.width * 0.8);
   const height = width * (9/16); // 16:9 aspect ratio
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -51,13 +51,24 @@ const BrowserApp: React.FC = () => {
            window.navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
   };
 
+  // Get app size based on screen size
+  const getAppSize = () => {
+    // Mobile optimized smaller size
+    if (window.innerWidth < 768) {
+      return [2.5, 2.5 / (16/9), 0.05] as [number, number, number];
+    }
+    return [3.5, 3.5 / (16/9), 0.05] as [number, number, number];
+  };
+
+  const appSize = getAppSize();
+
   return (
     <group>
-      <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
+      <Box args={appSize} position={[0, 0, 0]}>
         <meshStandardMaterial color="#58b792" />
         <Html
           transform
-          distanceFactor={12} // Adjusted for better scale in smaller window
+          distanceFactor={10}
           position={[0, 0, 0.06]}
           scale={[0.025 * scaleFactor, 0.025 * scaleFactor, 0.025]}
           occlude
@@ -68,14 +79,14 @@ const BrowserApp: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: 'white',
-            borderRadius: '10px',
+            borderRadius: '8px',
             overflow: 'hidden',
             pointerEvents: 'auto',
             boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
           }}
         >
           <div style={{ 
-            padding: '8px', 
+            padding: '6px', 
             backgroundColor: '#f7f7f7', 
             borderBottom: '1px solid #ddd',
             display: 'flex'
@@ -88,8 +99,8 @@ const BrowserApp: React.FC = () => {
                 placeholder="Search or enter website name"
                 style={{
                   flex: 1,
-                  padding: '6px 10px',
-                  fontSize: '14px',
+                  padding: '4px 8px',
+                  fontSize: '13px',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                 }}
@@ -97,14 +108,14 @@ const BrowserApp: React.FC = () => {
               <button
                 type="submit"
                 style={{
-                  marginLeft: '8px',
-                  padding: '6px 12px',
+                  marginLeft: '6px',
+                  padding: '4px 8px',
                   backgroundColor: '#58b792',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
-                  fontSize: '14px'
+                  fontSize: '13px'
                 }}
               >
                 Go
