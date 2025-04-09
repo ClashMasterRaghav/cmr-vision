@@ -8,6 +8,7 @@ import GithubApp from './apps/GithubApp';
 import MapsApp from './apps/MapsApp';
 import BrowserApp from './apps/BrowserApp';
 import ARCamera from './ARCamera';
+import { useFrame } from '@react-three/fiber';
 
 interface VREnvironmentProps {
   selectedApp: AppType;
@@ -21,7 +22,7 @@ const SCREEN_DEPTH = 0.05;
 const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   // Track all screens - reference like in sample code
   const [screens, setScreens] = useState<{ id: AppType, position: THREE.Vector3 }[]>([]);
-  const frameId = useRef<number>(0);
+  const appRef = useRef<THREE.Group>(null);
   
   // Calculate app size based on device
   const [appSize, setAppSize] = useState<[number, number, number]>([SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_DEPTH]);
@@ -78,60 +79,74 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
   
-  // Animate screens slightly like in the sample code
-  useEffect(() => {
-    const animate = () => {
-      if (selectedApp) {
-        // Get the reference to the app container's DOM element
-        const appContainer = document.getElementById(`app-${selectedApp}`);
-        if (appContainer) {
-          // Apply subtle floating animation
-          const time = Date.now() * 0.001;
-          const yOffset = Math.sin(time * 1.5) * 0.01;
-          appContainer.style.transform = `translateY(${yOffset}px)`;
-        }
-      }
+  // Use Three.js animation system instead of DOM manipulation
+  useFrame(() => {
+    if (appRef.current) {
+      // Apply subtle floating animation
+      const time = Date.now() * 0.001;
+      const yOffset = Math.sin(time * 1.5) * 0.01;
       
-      frameId.current = requestAnimationFrame(animate);
-    };
-    
-    animate();
-    return () => cancelAnimationFrame(frameId.current);
-  }, [selectedApp]);
+      // Update the Y position with the animation
+      if (appRef.current.position.y !== undefined) {
+        const originalY = appPositions[selectedApp].y;
+        appRef.current.position.y = originalY + yOffset;
+      }
+    }
+  });
 
   // Render the selected app with correct styling and position
   const renderApp = () => {
     if (selectedApp === 'video') {
       return (
-        <group position={appPositions.video} id="app-video">
+        <group 
+          ref={appRef}
+          position={appPositions.video} 
+          userData={{ appType: 'video' }}
+        >
           <VideoApp />
         </group>
       );
     }
     if (selectedApp === 'youtube') {
       return (
-        <group position={appPositions.youtube} id="app-youtube">
+        <group 
+          ref={appRef}
+          position={appPositions.youtube} 
+          userData={{ appType: 'youtube' }}
+        >
           <YoutubeApp />
         </group>
       );
     }
     if (selectedApp === 'github') {
       return (
-        <group position={appPositions.github} id="app-github">
+        <group 
+          ref={appRef}
+          position={appPositions.github} 
+          userData={{ appType: 'github' }}
+        >
           <GithubApp />
         </group>
       );
     }
     if (selectedApp === 'maps') {
       return (
-        <group position={appPositions.maps} id="app-maps">
+        <group 
+          ref={appRef}
+          position={appPositions.maps} 
+          userData={{ appType: 'maps' }}
+        >
           <MapsApp />
         </group>
       );
     }
     if (selectedApp === 'browser') {
       return (
-        <group position={appPositions.browser} id="app-browser">
+        <group 
+          ref={appRef}
+          position={appPositions.browser} 
+          userData={{ appType: 'browser' }}
+        >
           <BrowserApp />
         </group>
       );
@@ -139,7 +154,11 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
     
     // Welcome screen when no app is selected
     return (
-      <group position={appPositions.welcome} id="app-welcome">
+      <group 
+        ref={appRef}
+        position={appPositions.welcome} 
+        userData={{ appType: 'welcome' }}
+      >
         <Box args={appSize} position={[0, 0, 0]}>
           <meshStandardMaterial color="#007AFF" />
           <mesh position={[0, 0, 0.051]}>
