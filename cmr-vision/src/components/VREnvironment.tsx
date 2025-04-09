@@ -70,10 +70,10 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
         userData={{ appType: selectedApp }}
       >
         {selectedApp === 'video' && <VideoApp viewportSize={viewport} />}
-        {selectedApp === 'youtube' && <YoutubeApp viewportSize={viewport} />}
-        {selectedApp === 'github' && <GithubApp viewportSize={viewport} />}
+        {selectedApp === 'youtube' && <YoutubeApp />}
+        {selectedApp === 'github' && <GithubApp />}
         {selectedApp === 'maps' && <MapsApp />}
-        {selectedApp === 'browser' && <BrowserApp viewportSize={viewport} />}
+        {selectedApp === 'browser' && <BrowserApp />}
         {selectedApp === 'welcome' && <WelcomeScreen viewportSize={viewport} />}
       </group>
     );
