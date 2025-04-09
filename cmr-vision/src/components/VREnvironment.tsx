@@ -28,7 +28,7 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   // Update active apps when selected app changes
   useEffect(() => {
-    if (selectedApp && !activeApps.includes(selectedApp)) {
+    if (selectedApp && selectedApp !== 'none' && !activeApps.includes(selectedApp)) {
       setActiveApps(prev => [...prev, selectedApp]);
     }
   }, [selectedApp, activeApps]);
@@ -139,7 +139,7 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
           const position = new THREE.Vector3(xOffset, 0, -2);
           
           return (
-            <group key={appType} position={position} userData={{ appType }}>
+            <group key={`app-${index}-${String(appType)}`} position={position} userData={{ appType }}>
               {appType === 'video' && <VideoApp viewportSize={viewport} />}
               {appType === 'youtube' && <YoutubeApp />}
               {appType === 'github' && <GithubApp />}

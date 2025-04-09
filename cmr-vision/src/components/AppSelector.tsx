@@ -31,8 +31,8 @@ const AppSelector: React.FC<AppSelectorProps> = ({ onSelectApp, selectedApp }) =
           </button>
         ))}
       </div>
-      {selectedApp && (
-        <button className="home-button" onClick={() => onSelectApp(null)}>
+      {selectedApp !== 'none' && (
+        <button className="home-button" onClick={() => onSelectApp('none')}>
           Home
         </button>
       )}

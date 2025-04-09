@@ -4,10 +4,10 @@ import './App.css';
 import VREnvironment from './components/VREnvironment';
 import AppSelector from './components/AppSelector';
 
-export type AppType = 'video' | 'youtube' | 'github' | 'maps' | 'browser' | 'welcome' | null;
+export type AppType = 'video' | 'youtube' | 'github' | 'maps' | 'browser' | 'welcome' | 'none';
 
 function App() {
-  const [selectedApp, setSelectedApp] = useState<AppType>(null);
+  const [selectedApp, setSelectedApp] = useState<AppType>('none');
   
   return (
     <div className="App">
