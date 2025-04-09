@@ -88,7 +88,10 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
       
       // Update the Y position with the animation
       if (appRef.current.position.y !== undefined) {
-        const originalY = appPositions[selectedApp].y;
+        // Check if selectedApp is a valid key in appPositions
+        const position = appPositions[selectedApp as keyof typeof appPositions];
+        // Use the position's y value or fallback to 0 if not available
+        const originalY = position ? position.y : 0;
         appRef.current.position.y = originalY + yOffset;
       }
     }
