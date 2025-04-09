@@ -99,7 +99,6 @@ const DraggableApp: React.FC<DraggableAppProps> = ({
         position={[0, height/2 - titleBarHeight/2, 0]} 
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
-        className="draggable-handle"
       >
         <boxGeometry args={[width, titleBarHeight, depth]} />
         <meshStandardMaterial color="#444444" transparent opacity={0.6} />
