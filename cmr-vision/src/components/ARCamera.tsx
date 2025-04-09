@@ -10,20 +10,6 @@ interface OrientationData {
   gamma: number;
 }
 
-// Interface for DeviceOrientationEvent with requestPermission
-interface DeviceOrientationEventWithPermission extends DeviceOrientationEvent {
-  requestPermission?: () => Promise<string>;
-}
-
-// Interface for Window with DeviceOrientationEvent
-interface WindowWithDeviceOrientation extends Window {
-  DeviceOrientationEvent: {
-    prototype: DeviceOrientationEvent;
-    new(): DeviceOrientationEvent;
-    requestPermission?: () => Promise<string>;
-  };
-}
-
 const ARCamera: React.FC = () => {
   const { camera } = useThree();
   const [hasPermission, setHasPermission] = useState(false);
@@ -43,34 +29,49 @@ const ARCamera: React.FC = () => {
       }
     };
 
-    // Check if DeviceOrientationEvent exists and if we need to request permission
-    const windowWithOrientation = window as WindowWithDeviceOrientation;
-    if (typeof windowWithOrientation !== 'undefined' && 
-        typeof windowWithOrientation.DeviceOrientationEvent !== 'undefined') {
-      
-      // iOS 13+ requires permission
-      if (typeof windowWithOrientation.DeviceOrientationEvent.requestPermission === 'function') {
-        windowWithOrientation.DeviceOrientationEvent.requestPermission()
-          .then((response: string) => {
-            if (response === 'granted') {
-              setHasPermission(true);
-              window.addEventListener('deviceorientation', handleDeviceOrientation);
-            }
-          })
-          .catch((error: any) => {
-            console.error('Error requesting device orientation permission:', error);
-          });
-      } else {
-        // For devices that don't require permission
-        setHasPermission(true);
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
+    // Try to request device orientation permission (for iOS 13+)
+    const requestDeviceOrientationPermission = async () => {
+      try {
+        // Check if the DeviceOrientationEvent has a requestPermission method (iOS 13+)
+        if (typeof window !== 'undefined' && 
+            window.DeviceOrientationEvent && 
+            typeof (window.DeviceOrientationEvent as any).requestPermission === 'function') {
+            
+          const permissionState = await (window.DeviceOrientationEvent as any).requestPermission();
+          return permissionState === 'granted';
+        }
+        // If the method doesn't exist, assume permission is granted
+        return true;
+      } catch (error) {
+        console.error('Error requesting device orientation permission:', error);
+        return false;
       }
-    } else {
-      console.warn('Device orientation not supported by this browser');
-    }
+    };
 
+    // Initialize device orientation if available
+    const initDeviceOrientation = async () => {
+      // Check if orientation is generally supported
+      if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
+        // Request permission if needed
+        const hasOrientationPermission = await requestDeviceOrientationPermission();
+        
+        if (hasOrientationPermission) {
+          setHasPermission(true);
+          window.addEventListener('deviceorientation', handleDeviceOrientation);
+        }
+      } else {
+        console.warn('Device orientation not supported by this browser');
+      }
+    };
+
+    // Start initialization
+    initDeviceOrientation();
+
+    // Clean up listener on unmount
     return () => {
-      window.removeEventListener('deviceorientation', handleDeviceOrientation);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('deviceorientation', handleDeviceOrientation);
+      }
     };
   }, []);
 
