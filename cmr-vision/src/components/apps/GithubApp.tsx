@@ -2,9 +2,19 @@ import React, { useRef, useEffect } from 'react';
 import { Box, Html } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 
-const GithubApp: React.FC = () => {
+interface GithubAppProps {
+  viewportSize: {
+    width: number,
+    height: number
+  }
+}
+
+const GithubApp: React.FC<GithubAppProps> = ({ viewportSize }) => {
   const { size } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Use the provided viewport size
+  const { width: vpWidth, height: vpHeight } = viewportSize;
   
   // Scale factor for the iframe - adjust as needed
   const scaleFactor = 0.95;

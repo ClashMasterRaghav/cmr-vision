@@ -7,11 +7,21 @@ import * as THREE from 'three';
 const SCREEN_WIDTH = 1.0;
 const SCREEN_HEIGHT = 0.75; 
 
-const BrowserApp: React.FC = () => {
+interface BrowserAppProps {
+  viewportSize: {
+    width: number,
+    height: number
+  }
+}
+
+const BrowserApp: React.FC<BrowserAppProps> = ({ viewportSize }) => {
   const [url, setUrl] = useState('https://duckduckgo.com/');
   const [searchInput, setSearchInput] = useState('');
   const { size } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Use the provided viewport size
+  const { width: vpWidth, height: vpHeight } = viewportSize;
   
   // Scale factor for the iframe - optimized for readability
   const scaleFactor = 1.5;

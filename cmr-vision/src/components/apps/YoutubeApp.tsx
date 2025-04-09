@@ -3,9 +3,19 @@ import { Box, Html } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const YoutubeApp: React.FC = () => {
+interface YoutubeAppProps {
+  viewportSize: {
+    width: number,
+    height: number
+  }
+}
+
+const YoutubeApp: React.FC<YoutubeAppProps> = ({ viewportSize }) => {
   const { size } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Use the provided viewport size
+  const { width: vpWidth, height: vpHeight } = viewportSize;
   
   // Scale factor for the iframe - adjust as needed
   const scaleFactor = 0.95;

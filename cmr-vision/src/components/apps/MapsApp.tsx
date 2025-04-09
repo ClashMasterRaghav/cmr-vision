@@ -3,15 +3,20 @@ import { Box, Html } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 
 const MapsApp: React.FC = () => {
-  const { size } = useThree();
+  const { size, viewport } = useThree();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  // Scale factor for the iframe - adjust as needed
+  // Scale factor optimized for visibility and interaction
   const scaleFactor = 0.95;
   
-  // Calculate iframe dimensions based on the canvas size
-  const width = Math.min(1600, size.width * 0.8);
+  // Calculate iframe dimensions based on the viewport
+  // This ensures it perfectly matches the screen size in VR
+  const width = Math.min(1600, viewport.width * 900); // Use viewport units for consistency
   const height = width * (9/16); // 16:9 aspect ratio
+  
+  // Box dimensions directly mapped to viewport
+  const boxWidth = 16; // Standard size across apps
+  const boxHeight = 9;  // 16:9 ratio for consistency
   
   useEffect(() => {
     // Fix for iOS/Safari that might have issues with iframes in WebGL
@@ -36,7 +41,7 @@ const MapsApp: React.FC = () => {
 
   return (
     <group>
-      <Box args={[16, 9, 0.1]} position={[0, 0, 0]}>
+      <Box args={[boxWidth, boxHeight, 0.1]} position={[0, 0, 0]}>
         <meshStandardMaterial color="#4285F4" />
         <Html
           transform
@@ -52,6 +57,7 @@ const MapsApp: React.FC = () => {
             borderRadius: '10px',
             overflow: 'hidden',
             pointerEvents: 'auto',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
           }}
         >
           {isElectron() ? (

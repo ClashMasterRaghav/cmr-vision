@@ -58,9 +58,9 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
   
   // Render the currently selected app in fullscreen
   const renderApp = () => {
-    // Calculate the position for the app
-    // Slight offset to prevent z-fighting with AR camera background
-    const position = new THREE.Vector3(0, 0, -1);
+    // Position screens further from camera to prevent clipping and improve depth perception
+    // Move from -1 to -2 units away
+    const position = new THREE.Vector3(0, 0, -2);
     
     // Create a fullscreen container
     const appContainer = (
@@ -72,11 +72,9 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({ selectedApp }) => {
         {selectedApp === 'video' && <VideoApp viewportSize={viewport} />}
         {selectedApp === 'youtube' && <YoutubeApp viewportSize={viewport} />}
         {selectedApp === 'github' && <GithubApp viewportSize={viewport} />}
-        {selectedApp === 'maps' && <MapsApp viewportSize={viewport} />}
+        {selectedApp === 'maps' && <MapsApp />}
         {selectedApp === 'browser' && <BrowserApp viewportSize={viewport} />}
-        {selectedApp === 'welcome' && (
-          <WelcomeScreen viewportSize={viewport} />
-        )}
+        {selectedApp === 'welcome' && <WelcomeScreen viewportSize={viewport} />}
       </group>
     );
     
