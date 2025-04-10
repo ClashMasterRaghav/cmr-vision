@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import { Vector3 } from 'three';
+import { v4 as uuidv4 } from 'uuid';
 
-export type AppType = 'videoPlayer' | 'youtube' | 'googleMaps' | 'browser' | 'github';
+// Define the different app types
+export type AppType = 'videoPlayer' | 'youtube' | 'googleMaps' | 'browser' | 'electron';
 
+// Define app window data structure
 export interface AppWindow {
   id: string;
   type: AppType;
@@ -11,54 +14,73 @@ export interface AppWindow {
   rotation: Vector3;
   scale: Vector3;
   isActive: boolean;
-  url?: string;
-  data?: any;
+  data: any; // App-specific data
 }
 
+// Define store state
 interface AppState {
   apps: AppWindow[];
   activeAppId: string | null;
-  addApp: (app: Omit<AppWindow, 'id'>) => void;
+  addApp: (appData: Omit<AppWindow, 'id'>) => void;
   removeApp: (id: string) => void;
   setActiveApp: (id: string) => void;
   updateAppPosition: (id: string, position: Vector3) => void;
-  updateAppRotation: (id: string, rotation: Vector3) => void;
-  updateAppScale: (id: string, scale: Vector3) => void;
 }
 
+// Create the store
 export const useAppStore = create<AppState>((set) => ({
   apps: [],
   activeAppId: null,
   
-  addApp: (app) => set((state) => {
-    const newApp = {
+  // Add a new app
+  addApp: (appData) => set((state) => {
+    // Deactivate all other apps
+    const updatedApps = state.apps.map(app => ({
       ...app,
-      id: crypto.randomUUID(),
+      isActive: false
+    }));
+    
+    // Create new app with unique ID
+    const newApp: AppWindow = {
+      ...appData,
+      id: uuidv4(),
+      isActive: true
     };
-    return { apps: [...state.apps, newApp] };
+    
+    return {
+      apps: [...updatedApps, newApp],
+      activeAppId: newApp.id
+    };
   }),
   
-  removeApp: (id) => set((state) => ({
-    apps: state.apps.filter(app => app.id !== id)
+  // Remove an app
+  removeApp: (id) => set((state) => {
+    const remainingApps = state.apps.filter(app => app.id !== id);
+    const newActiveId = state.activeAppId === id 
+      ? (remainingApps.length > 0 ? remainingApps[remainingApps.length - 1].id : null) 
+      : state.activeAppId;
+      
+    return {
+      apps: remainingApps,
+      activeAppId: newActiveId
+    };
+  }),
+  
+  // Set the active app
+  setActiveApp: (id) => set((state) => ({
+    apps: state.apps.map(app => ({
+      ...app,
+      isActive: app.id === id
+    })),
+    activeAppId: id
   })),
   
-  setActiveApp: (id) => set({ activeAppId: id }),
-  
+  // Update app position (for dragging)
   updateAppPosition: (id, position) => set((state) => ({
     apps: state.apps.map(app => 
-      app.id === id ? { ...app, position } : app
+      app.id === id 
+        ? { ...app, position } 
+        : app
     )
-  })),
-  
-  updateAppRotation: (id, rotation) => set((state) => ({
-    apps: state.apps.map(app => 
-      app.id === id ? { ...app, rotation } : app
-    )
-  })),
-  
-  updateAppScale: (id, scale) => set((state) => ({
-    apps: state.apps.map(app => 
-      app.id === id ? { ...app, scale } : app
-    )
-  })),
+  }))
 })); 
