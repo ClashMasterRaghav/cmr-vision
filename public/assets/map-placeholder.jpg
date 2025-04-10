@@ -1,7 +1,0 @@
-This is a placeholder file for map-placeholder.jpg
-
-Please manually create a map image and save it with this filename, or you can convert the SVG version to JPG.
-
-The SVG version has already been created at public/assets/map-placeholder.svg and can be used in most cases.
-
-For a quick solution, you can rename the SVG version to use it in place of this file. 
