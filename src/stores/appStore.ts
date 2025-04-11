@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 
 // Define the different app types
-export type AppType = 'videoPlayer' | 'youtube' | 'googleMaps' | 'browser' | 'electron';
+export type AppType = 'videoPlayer' | 'youtube' | 'googleMaps' | 'browser' | 'notepad' | 'paint' | 'calculator';
 
 // Define app window data structure
 export interface AppWindow {

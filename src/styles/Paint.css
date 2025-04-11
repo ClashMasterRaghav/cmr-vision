@@ -1,0 +1,144 @@
+.paint-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.paint-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #ECE9D8;
+  border-bottom: 1px solid #ACA899;
+}
+
+.paint-tools {
+  display: flex;
+  gap: 5px;
+}
+
+.paint-tool-button {
+  width: 32px;
+  height: 32px;
+  background-color: #fff;
+  border: 1px solid #ACA899;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.paint-tool-button:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+}
+
+.paint-tool-button.active {
+  background-color: #C2D5F2;
+  color: #333;
+  border-color: #7DA2CE;
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.paint-tool-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+}
+
+.paint-tool-button:disabled svg {
+  opacity: 0.5;
+}
+
+.paint-history-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.paint-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 5px;
+  border-left: 1px solid #ACA899;
+  margin-left: 10px;
+  padding-left: 10px;
+}
+
+.paint-color-picker input {
+  height: 30px;
+  width: 30px;
+  padding: 0;
+  border: 1px solid #ACA899;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+}
+
+.paint-brush-size {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.paint-brush-size input {
+  width: 100px;
+  cursor: pointer;
+  accent-color: #3e95ed;
+}
+
+.paint-brush-size span {
+  font-size: 12px;
+  min-width: 35px;
+  color: #333;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+}
+
+.paint-canvas-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ACA899;
+  margin: 10px;
+}
+
+.paint-canvas {
+  border: 1px solid #ccc;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Tooltips for buttons */
+.paint-tool-button:hover::after {
+  content: attr(title);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  background: #333;
+  color: #fff;
+  font-size: 10px;
+  white-space: nowrap;
+  z-index: 100;
+  border-radius: 3px;
+  margin-top: 5px;
+  pointer-events: none;
+} 
