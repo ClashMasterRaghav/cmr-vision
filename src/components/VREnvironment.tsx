@@ -16,8 +16,7 @@ interface VREnvironmentProps {
 
 const VREnvironment: React.FC<VREnvironmentProps> = ({
   activeAppId,
-  onWindowClose,
-  onWindowFocus
+  onWindowClose
 }) => {
   const { apps } = useAppStore();
 
@@ -25,7 +24,6 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({
     <div className="vr-environment">
       {apps.map(app => {
         const closeApp = () => onWindowClose(app.id);
-        const isActive = app.id === activeAppId;
         
         switch (app.type) {
           case 'browser':

@@ -2,47 +2,19 @@ import React, { useState } from 'react';
 import AppWindow from '../components/AppWindow';
 
 interface CalculatorAppProps {
-  id: string;
+  id: string; // Required for routing/identification even if not directly used
   title: string;
   onClose: () => void;
-  data: {
-    value?: string;
-  };
+  data: any;
 }
 
-const CalculatorApp: React.FC<CalculatorAppProps> = ({ id, title, onClose, data }) => {
-  const [display, setDisplay] = useState(data.value || '0');
+const CalculatorApp: React.FC<CalculatorAppProps> = ({ title, onClose }) => {
+  const [display, setDisplay] = useState('0');
+  const [operator, setOperator] = useState<string | null>(null);
+  const [prevValue, setPrevValue] = useState<number | null>(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
-  const [pendingOperator, setPendingOperator] = useState<string | null>(null);
-  const [storedValue, setStoredValue] = useState<number>(0);
   
-  const clearAll = () => {
-    setDisplay('0');
-    setWaitingForOperand(false);
-    setPendingOperator(null);
-    setStoredValue(0);
-  };
-  
-  const clearDisplay = () => {
-    setDisplay('0');
-    setWaitingForOperand(false);
-  };
-  
-  const clearLastChar = () => {
-    setDisplay(display.length > 1 ? display.substring(0, display.length - 1) : '0');
-  };
-  
-  const toggleSign = () => {
-    const value = parseFloat(display);
-    setDisplay(value ? (-value).toString() : '0');
-  };
-  
-  const inputPercent = () => {
-    const value = parseFloat(display);
-    setDisplay((value / 100).toString());
-  };
-  
-  const inputDigit = (digit: string) => {
+  const handleDigit = (digit: string) => {
     if (waitingForOperand) {
       setDisplay(digit);
       setWaitingForOperand(false);
@@ -51,77 +23,57 @@ const CalculatorApp: React.FC<CalculatorAppProps> = ({ id, title, onClose, data 
     }
   };
   
-  const inputDecimal = () => {
-    if (waitingForOperand) {
-      setDisplay('0.');
-      setWaitingForOperand(false);
-    } else if (display.indexOf('.') === -1) {
-      setDisplay(display + '.');
+  // Used in the UI for the C button
+  const clearAll = () => {
+    setDisplay('0');
+    setOperator(null);
+    setPrevValue(null);
+    setWaitingForOperand(false);
+  };
+  
+  const handleOperator = (nextOperator: string) => {
+    const inputValue = parseFloat(display);
+    
+    if (prevValue === null) {
+      setPrevValue(inputValue);
+    } else if (operator) {
+      const result = performCalculation(operator, prevValue, inputValue);
+      setDisplay(String(result));
+      setPrevValue(result);
+    }
+    
+    setWaitingForOperand(true);
+    setOperator(nextOperator);
+  };
+  
+  const performCalculation = (op: string, a: number, b: number): number => {
+    switch (op) {
+      case '+': return a + b;
+      case '-': return a - b;
+      case '×': return a * b;
+      case '÷': return a / b;
+      default: return b;
     }
   };
   
-  const performOperation = (operator: string) => {
-    const value = parseFloat(display);
+  const handleEquals = () => {
+    if (operator === null || prevValue === null) return;
     
-    if (pendingOperator !== null) {
-      const currentValue = storedValue || 0;
-      let newValue;
-      
-      switch (pendingOperator) {
-        case '+':
-          newValue = currentValue + value;
-          break;
-        case '-':
-          newValue = currentValue - value;
-          break;
-        case '×':
-          newValue = currentValue * value;
-          break;
-        case '÷':
-          newValue = currentValue / value;
-          break;
-        default:
-          newValue = value;
-      }
-      
-      setDisplay(newValue.toString());
-      setStoredValue(newValue);
-    } else {
-      setStoredValue(value);
-    }
+    const inputValue = parseFloat(display);
+    const result = performCalculation(operator, prevValue, inputValue);
     
-    setPendingOperator(operator);
+    setDisplay(String(result));
+    setPrevValue(null);
+    setOperator(null);
     setWaitingForOperand(true);
   };
   
-  const calculateResult = () => {
-    const value = parseFloat(display);
-    
-    if (pendingOperator !== null && !waitingForOperand) {
-      const currentValue = storedValue || 0;
-      let newValue;
-      
-      switch (pendingOperator) {
-        case '+':
-          newValue = currentValue + value;
-          break;
-        case '-':
-          newValue = currentValue - value;
-          break;
-        case '×':
-          newValue = currentValue * value;
-          break;
-        case '÷':
-          newValue = currentValue / value;
-          break;
-        default:
-          newValue = value;
-      }
-      
-      setDisplay(newValue.toString());
-      setStoredValue(newValue);
-      setPendingOperator(null);
-      setWaitingForOperand(true);
+  const handleDecimal = () => {
+    if (waitingForOperand) {
+      setDisplay('0.');
+      setWaitingForOperand(false);
+    } else if (!display.includes('.')) {
+      setDisplay(display + '.');
     }
   };
   
@@ -135,37 +87,36 @@ const CalculatorApp: React.FC<CalculatorAppProps> = ({ id, title, onClose, data 
         <div className="calculator-keypad">
           <div className="calculator-row">
             <button className="calculator-key calculator-key-clear" onClick={clearAll}>C</button>
-            <button className="calculator-key" onClick={clearLastChar}>←</button>
-            <button className="calculator-key" onClick={inputPercent}>%</button>
-            <button className="calculator-key calculator-key-operation" onClick={() => performOperation('÷')}>÷</button>
+            <button className="calculator-key" onClick={() => setDisplay(display.startsWith('-') ? display.substr(1) : '-' + display)}>±</button>
+            <button className="calculator-key" onClick={() => handleOperator('%')}>%</button>
+            <button className="calculator-key calculator-key-operation" onClick={() => handleOperator('÷')}>÷</button>
           </div>
           
           <div className="calculator-row">
-            <button className="calculator-key" onClick={() => inputDigit('7')}>7</button>
-            <button className="calculator-key" onClick={() => inputDigit('8')}>8</button>
-            <button className="calculator-key" onClick={() => inputDigit('9')}>9</button>
-            <button className="calculator-key calculator-key-operation" onClick={() => performOperation('×')}>×</button>
+            <button className="calculator-key" onClick={() => handleDigit('7')}>7</button>
+            <button className="calculator-key" onClick={() => handleDigit('8')}>8</button>
+            <button className="calculator-key" onClick={() => handleDigit('9')}>9</button>
+            <button className="calculator-key calculator-key-operation" onClick={() => handleOperator('×')}>×</button>
           </div>
           
           <div className="calculator-row">
-            <button className="calculator-key" onClick={() => inputDigit('4')}>4</button>
-            <button className="calculator-key" onClick={() => inputDigit('5')}>5</button>
-            <button className="calculator-key" onClick={() => inputDigit('6')}>6</button>
-            <button className="calculator-key calculator-key-operation" onClick={() => performOperation('-')}>-</button>
+            <button className="calculator-key" onClick={() => handleDigit('4')}>4</button>
+            <button className="calculator-key" onClick={() => handleDigit('5')}>5</button>
+            <button className="calculator-key" onClick={() => handleDigit('6')}>6</button>
+            <button className="calculator-key calculator-key-operation" onClick={() => handleOperator('-')}>−</button>
           </div>
           
           <div className="calculator-row">
-            <button className="calculator-key" onClick={() => inputDigit('1')}>1</button>
-            <button className="calculator-key" onClick={() => inputDigit('2')}>2</button>
-            <button className="calculator-key" onClick={() => inputDigit('3')}>3</button>
-            <button className="calculator-key calculator-key-operation" onClick={() => performOperation('+')}>+</button>
+            <button className="calculator-key" onClick={() => handleDigit('1')}>1</button>
+            <button className="calculator-key" onClick={() => handleDigit('2')}>2</button>
+            <button className="calculator-key" onClick={() => handleDigit('3')}>3</button>
+            <button className="calculator-key calculator-key-operation" onClick={() => handleOperator('+')}>+</button>
           </div>
           
           <div className="calculator-row">
-            <button className="calculator-key" onClick={toggleSign}>±</button>
-            <button className="calculator-key" onClick={() => inputDigit('0')}>0</button>
-            <button className="calculator-key" onClick={inputDecimal}>.</button>
-            <button className="calculator-key calculator-key-equals" onClick={calculateResult}>=</button>
+            <button className="calculator-key" onClick={() => handleDigit('0')}>0</button>
+            <button className="calculator-key" onClick={handleDecimal}>.</button>
+            <button className="calculator-key calculator-key-equals" onClick={handleEquals}>=</button>
           </div>
         </div>
       </div>

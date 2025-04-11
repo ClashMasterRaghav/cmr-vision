@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import AppWindow from '../AppWindow';
 
 interface NotepadProps {
-  id: string;
-  title: string;
+  id?: string; // Optional now since we don't use it directly
+  title?: string; // Optional now since we use a computed title
   onClose: () => void;
   data?: {
     content?: string;
   };
 }
 
-const Notepad: React.FC<NotepadProps> = ({ id, title, onClose, data = {} }) => {
+const Notepad: React.FC<NotepadProps> = ({ onClose, data = {} }) => {
   const [text, setText] = useState<string>(data.content || '');
   const [isSaved, setIsSaved] = useState<boolean>(true);
   const [fileName, setFileName] = useState<string>('Untitled.txt');

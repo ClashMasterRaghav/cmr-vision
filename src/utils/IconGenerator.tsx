@@ -113,14 +113,13 @@ export const generateIconSVG = (appType: string, size: number = 32): string => {
 interface AppIconProps {
   type: string;
   size?: number;
-  color?: string;
   className?: string;
 }
 
 /**
  * AppIcon component that renders SVG icons for different app types
  */
-export const AppIcon: React.FC<AppIconProps> = ({ type, size = 32, color, className }) => {
+export const AppIcon: React.FC<AppIconProps> = ({ type, size = 32, className }) => {
   const svgContent = generateIconSVG(type, size);
   
   return (

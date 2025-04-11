@@ -1,7 +1,6 @@
 import React from 'react';
 import Paint from '../components/apps/Paint';
 import AppWindow from '../components/AppWindow';
-import { AppWindow as AppWindowType } from '../stores/appStore';
 
 interface PaintAppProps {
   id: string;
@@ -10,10 +9,9 @@ interface PaintAppProps {
   data: any;
 }
 
-const PaintApp: React.FC<PaintAppProps> = ({ id, title, onClose, data }) => {
+const PaintApp: React.FC<PaintAppProps> = ({ title, onClose }) => {
   return (
     <AppWindow
-      id={id}
       title={title}
       onClose={onClose}
       defaultWidth={800}

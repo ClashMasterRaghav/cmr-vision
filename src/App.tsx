@@ -16,11 +16,6 @@ const spawnPositions = [
   new Vector3(-4, 0, 4),     // Left side of couch
 ];
 
-// Simple icon renderer component
-const Icon = ({ name }: { name: string }) => {
-  return <div className="icon"><AppIcon type={name} size={32} /></div>;
-};
-
 const App: React.FC = () => {
   const [showStartMenu, setShowStartMenu] = useState(false);
   const [activeAppId, setActiveAppId] = useState<string | null>(null);

@@ -2,7 +2,7 @@ import React from 'react';
 import AppWindow from '../components/AppWindow';
 
 interface VideoPlayerAppProps {
-  id: string;
+  id: string; // Needed for app identification but not used directly
   title: string;
   onClose: () => void;
   data: {
@@ -10,7 +10,7 @@ interface VideoPlayerAppProps {
   };
 }
 
-const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, data }) => {
+const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ title, onClose, data }) => {
   // Use the video path from data, with fallback
   const videoPath = data.videoSrc || '/videos/sample_video.mp4';
   

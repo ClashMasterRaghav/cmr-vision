@@ -17,9 +17,9 @@ const GoogleMapsApp: React.FC<GoogleMapsAppProps> = ({ id, title, onClose, data 
   const [error, setError] = useState(false);
   // Default location (San Francisco)
   const defaultLocation = { lat: 37.7749, lng: -122.4194 };
-  // Use state for location so it can be updated
-  const [location, setLocation] = useState(data.location || defaultLocation);
-  const [zoom, setZoom] = useState(data.zoom || 12);
+  // Use the location and zoom from data or defaults
+  const location = data.location || defaultLocation;
+  const zoom = data.zoom || 12;
   
   // Generate the map src URL based on current location or search query
   const getMapSrc = () => {
