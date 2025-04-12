@@ -1,25 +1,44 @@
-import React, { useState } from 'react'
-import { Vector3 } from 'three'
-import VREnvironment from './components/VREnvironment'
-import { useAppStore, AppType } from './stores/appStore'
-import { AppIcon } from './utils/IconGenerator'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { Vector3 } from 'three';
+import VREnvironment from './components/VREnvironment';
+import { useAppStore, AppType } from './stores/appStore';
+import { getAssetPath } from './utils/assetUtils';
+import './App.css';
 
 // Predefined spawn positions for a better layout in the room
 const spawnPositions = [
-  new Vector3(-3, 1, -6),    // Above desk
-  new Vector3(0, 1, -6),     // Above desk center
-  new Vector3(3, 0, -4),     // Right side of room
-  new Vector3(-6, 0, 0),     // Left wall
-  new Vector3(6, 0, 0),      // Right wall
-  new Vector3(0, 1, 4),      // Above couch
-  new Vector3(-4, 0, 4),     // Left side of couch
+  new Vector3(50, 50, 0),
+  new Vector3(150, 150, 0),
+  new Vector3(250, 250, 0),
+  new Vector3(350, 150, 0),
+  new Vector3(450, 50, 0),
+  new Vector3(150, 350, 0),
+  new Vector3(250, 450, 0),
+];
+
+// Define desktop icons
+const desktopIcons = [
+  { type: 'myComputer', title: 'My Computer', icon: 'images/icons/my_computer.png' },
+  { type: 'recycleBin', title: 'Recycle Bin', icon: 'images/icons/recyclebin.png' },
+  { type: 'browser', title: 'Internet Explorer', icon: 'images/icons/internet_explorer.png' },
+  { type: 'videoPlayer', title: 'Windows Media Player', icon: 'images/icons/windows_media_player.png' },
+  { type: 'youtube', title: 'Video Player', icon: 'images/icons/video_player.png' },
+  { type: 'googleMaps', title: 'Google Maps', icon: 'images/icons/search.png' },
+  { type: 'notepad', title: 'Notepad', icon: 'images/icons/notepad.png' },
+  { type: 'paint', title: 'Paint', icon: 'images/icons/paint.png' },
+  { type: 'calculator', title: 'Calculator', icon: 'images/icons/calculator.png' },
+  { type: 'calendar', title: 'Calendar', icon: 'images/icons/calender.png' },
 ];
 
 const App: React.FC = () => {
   const [showStartMenu, setShowStartMenu] = useState(false);
-  const [activeAppId, setActiveAppId] = useState<string | null>(null);
-  const { apps, addApp, removeApp, setActiveApp } = useAppStore();
+  const [currentTime, setCurrentTime] = useState(getCurrentTime());
+  const { apps, addApp, removeApp, setActiveApp, toggleMinimize } = useAppStore();
+  const activeAppId = apps.find(app => app.isActive)?.id || null;
+  const [isShuttingDown, setIsShuttingDown] = useState(false);
+  const [isBooting, setIsBooting] = useState(false);
+  const [showShutdownDialog, setShowShutdownDialog] = useState(false);
+  const [shutdownAction, setShutdownAction] = useState<'restart' | 'poweroff' | null>(null);
 
   const launchApp = (type: AppType) => {
     // Create default data based on app type
@@ -29,7 +48,7 @@ const App: React.FC = () => {
     switch (type) {
       case 'videoPlayer':
         title = 'Windows Media Player';
-        data = { videoSrc: '/videos/sample-video.mp4' };
+        data = { videoSrc: getAssetPath('videos/sample-video.mp4') };
         break;
       case 'youtube':
         title = 'Video Player';
@@ -55,16 +74,28 @@ const App: React.FC = () => {
         title = 'Calculator';
         data = {};
         break;
+      case 'calendar':
+        title = 'Calendar';
+        data = {};
+        break;
+      case 'myComputer':
+        title = 'My Computer';
+        data = { content: 'My Computer contents will appear here.' };
+        break;
+      case 'recycleBin':
+        title = 'Recycle Bin';
+        data = { content: 'Recycle Bin is empty.' };
+        break;
     }
 
     // Get a random spawn position
     const position = spawnPositions[Math.floor(Math.random() * spawnPositions.length)];
     
-        addApp({
-          type,
-          title,
-          position,
-          rotation: new Vector3(0, 0, 0),
+    addApp({
+      type,
+      title,
+      position,
+      rotation: new Vector3(0, 0, 0),
       scale: new Vector3(1, 1, 1),
       isActive: true,
       data
@@ -74,8 +105,13 @@ const App: React.FC = () => {
   };
 
   const handleAppClick = (id: string) => {
-    setActiveApp(id);
-    setActiveAppId(id);
+    // Check if app is minimized
+    const app = apps.find(app => app.id === id);
+    if (app?.isMinimized) {
+      toggleMinimize(id);
+    } else {
+      setActiveApp(id);
+    }
   };
 
   const handleCloseStartMenu = () => {
@@ -85,7 +121,7 @@ const App: React.FC = () => {
   };
 
   // Format current time for taskbar
-  const getCurrentTime = () => {
+  function getCurrentTime() {
     const now = new Date();
     const hours = now.getHours();
     const minutes = now.getMinutes();
@@ -94,12 +130,10 @@ const App: React.FC = () => {
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
-  };
-
-  const [currentTime, setCurrentTime] = useState(getCurrentTime());
+  }
 
   // Update the time every minute
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(getCurrentTime());
     }, 60000);
@@ -107,59 +141,140 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Function to get icon for app type
+  const getAppIconPath = (type: AppType): string => {
+    const icon = desktopIcons.find(icon => icon.type === type);
+    return icon ? getAssetPath(icon.icon) : getAssetPath('images/icons/question_mark.png');
+  };
+
+  // Handler for restart functionality
+  const handleRestart = () => {
+    setShowStartMenu(false);
+    setShutdownAction('restart');
+    setShowShutdownDialog(true);
+  };
+  
+  // Handler for power off functionality
+  const handlePowerOff = () => {
+    setShowStartMenu(false);
+    setShutdownAction('poweroff');
+    setShowShutdownDialog(true);
+  };
+  
+  // Confirm shutdown action
+  const confirmShutdown = () => {
+    setShowShutdownDialog(false);
+    setIsShuttingDown(true);
+    
+    if (shutdownAction === 'restart') {
+      // Show shutdown screen for 2 seconds, then show boot screen, then refresh
+      setTimeout(() => {
+        setIsShuttingDown(false);
+        setIsBooting(true);
+        // Show boot screen for 3 seconds before reloading
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }, 2000);
+    } else {
+      // Close all apps for power off
+      apps.forEach(app => {
+        removeApp(app.id);
+      });
+    }
+  };
+  
+  // Cancel shutdown
+  const cancelShutdown = () => {
+    setShowShutdownDialog(false);
+    setShutdownAction(null);
+  };
+
   return (
     <div className="app-container" onClick={handleCloseStartMenu}>
+      {isShuttingDown && (
+        <div className="shutdown-screen">
+          <div className="shutdown-logo"></div>
+          <div className="shutdown-message">
+            {shutdownAction === 'restart' 
+              ? "Please wait while your computer restarts..." 
+              : "It is now safe to turn off your computer"}
+          </div>
+          <div className="shutdown-progress">
+            <div className="shutdown-progress-blocks">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="shutdown-block"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {isBooting && (
+        <div className="shutdown-screen">
+          <div className="shutdown-logo"></div>
+          <div className="shutdown-message">
+            Starting Windows...
+          </div>
+          <div className="shutdown-progress">
+            <div className="shutdown-progress-blocks">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="shutdown-block"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {showShutdownDialog && (
+        <div className="xp-dialog-overlay">
+          <div className="xp-dialog">
+            <div className="xp-dialog-header">
+              <div className="xp-dialog-title">
+                {shutdownAction === 'restart' ? "Restart Windows" : "Shut Down Windows"}
+              </div>
+              <button className="xp-dialog-close" onClick={cancelShutdown}>✕</button>
+            </div>
+            <div className="xp-dialog-content">
+              <div className="xp-dialog-icon">
+                <img 
+                  src={getAssetPath(shutdownAction === 'restart' ? 'images/icons/restart.png' : 'images/icons/poweroff.png')} 
+                  alt={shutdownAction === 'restart' ? "Restart" : "Shut Down"} 
+                  width="48" 
+                  height="48" 
+                />
+              </div>
+              <div className="xp-dialog-message">
+                {shutdownAction === 'restart' 
+                  ? "Are you sure you want to restart your computer?" 
+                  : "Are you sure you want to shut down your computer?"}
+              </div>
+            </div>
+            <div className="xp-dialog-actions">
+              <button className="xp-button" onClick={confirmShutdown}>Yes</button>
+              <button className="xp-button" onClick={cancelShutdown}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Desktop Icons */}
       <div className="desktop-icons">
-        <div className="desktop-icon" onClick={() => launchApp('browser')}>
-          <AppIcon type="browser" size={40} className="icon-img" />
-          <div className="icon-text">Internet Explorer</div>
-        </div>
-        
-        <div className="desktop-icon" onClick={() => launchApp('videoPlayer')}>
-          <AppIcon type="videoPlayer" size={40} className="icon-img" />
-          <div className="icon-text">Windows Media Player</div>
-        </div>
-        
-        <div className="desktop-icon" onClick={() => launchApp('youtube')}>
-          <AppIcon type="youtube" size={40} className="icon-img" />
-          <div className="icon-text">Video Player</div>
-        </div>
-        
-        <div className="desktop-icon" onClick={() => launchApp('googleMaps')}>
-          <AppIcon type="googleMaps" size={40} className="icon-img" />
-          <div className="icon-text">Google Maps</div>
-        </div>
-        
-        <div className="desktop-icon" onClick={() => launchApp('notepad')}>
-          <AppIcon type="notepad" size={40} className="icon-img" />
-          <div className="icon-text">Notepad</div>
-        </div>
-        
-        <div className="desktop-icon" onClick={() => launchApp('paint')}>
-          <AppIcon type="paint" size={40} className="icon-img" />
-          <div className="icon-text">Paint</div>
-        </div>
-        
-        <div className="desktop-icon" onClick={() => launchApp('calculator')}>
-          <AppIcon type="calculator" size={40} className="icon-img" />
-          <div className="icon-text">Calculator</div>
-        </div>
-        
-        <div className="desktop-icon">
-          <AppIcon type="myComputer" size={40} className="icon-img" />
-          <div className="icon-text">My Computer</div>
-        </div>
-        
-        <div className="desktop-icon">
-          <AppIcon type="recycle" size={40} className="icon-img" />
-          <div className="icon-text">Recycle Bin</div>
-        </div>
+        {desktopIcons.map((icon, index) => (
+          <div 
+            key={index}
+            className="desktop-icon" 
+            onClick={() => launchApp(icon.type as AppType)}
+          >
+            <img src={getAssetPath(icon.icon)} alt={icon.title} className="icon-img" />
+            <div className="icon-text">{icon.title}</div>
+          </div>
+        ))}
       </div>
 
       {/* Windows XP Environment with app windows */}
       <VREnvironment 
-        activeAppId={activeAppId} 
+        activeAppId={activeAppId}
         onWindowClose={removeApp}
         onWindowFocus={handleAppClick}
       />
@@ -173,7 +288,7 @@ const App: React.FC = () => {
             setShowStartMenu(!showStartMenu);
           }}
         >
-          <AppIcon type="startButton" size={24} />
+          <img src={getAssetPath('images/icons/windows.png')} alt="Start" width="24" height="24" />
           <span>Start</span>
         </div>
         
@@ -184,7 +299,7 @@ const App: React.FC = () => {
               className={`taskbar-app ${app.id === activeAppId ? 'active' : ''}`}
               onClick={() => handleAppClick(app.id)}
             >
-              <AppIcon type={app.type} size={16} className="taskbar-app-icon" />
+              <img src={getAppIconPath(app.type)} alt={app.title} />
               <span>{app.title}</span>
             </div>
           ))}
@@ -199,88 +314,64 @@ const App: React.FC = () => {
       {showStartMenu && (
         <div className="start-menu" onClick={(e) => e.stopPropagation()}>
           <div className="start-menu-header">
-            <img src="https://i.imgur.com/UxQ7HJZ.png" alt="User" />
+            <img src={getAssetPath('images/icons/profile.png')} alt="User" />
             <span>User</span>
           </div>
           
           <div className="start-menu-items">
             <div className="start-menu-left">
-              <div className="start-menu-item" onClick={() => launchApp('browser')}>
-                <AppIcon type="browser" size={32} />
-                <span>Internet Explorer</span>
+              <div className="start-menu-item" onClick={() => launchApp('myComputer')}>
+                <img src={getAssetPath('images/icons/my_computer.png')} alt="My Computer" width="32" height="32" />
+                <span>My Computer</span>
               </div>
               
-              <div className="start-menu-item" onClick={() => launchApp('videoPlayer')}>
-                <AppIcon type="videoPlayer" size={32} />
-                <span>Windows Media Player</span>
-              </div>
-              
-              <div className="start-menu-item" onClick={() => launchApp('youtube')}>
-                <AppIcon type="youtube" size={32} />
-                <span>Video Player</span>
-              </div>
-              
-              <div className="start-menu-item" onClick={() => launchApp('googleMaps')}>
-                <AppIcon type="googleMaps" size={32} />
-                <span>Google Maps</span>
-              </div>
-              
-              <div className="start-menu-item" onClick={() => launchApp('notepad')}>
-                <AppIcon type="notepad" size={32} />
-                <span>Notepad</span>
-              </div>
-              
-              <div className="start-menu-item" onClick={() => launchApp('paint')}>
-                <AppIcon type="paint" size={32} />
-                <span>Paint</span>
-              </div>
-              
-              <div className="start-menu-item" onClick={() => launchApp('calculator')}>
-                <AppIcon type="calculator" size={32} />
-                <span>Calculator</span>
+              <div className="start-menu-item" onClick={() => launchApp('recycleBin')}>
+                <img src={getAssetPath('images/icons/recyclebin.png')} alt="Recycle Bin" width="32" height="32" />
+                <span>Recycle Bin</span>
               </div>
               
               <div className="start-menu-separator" />
               
-              <div className="start-menu-item">
-                <AppIcon type="myComputer" size={32} />
-                <span>My Computer</span>
-              </div>
-              
-              <div className="start-menu-item">
-                <AppIcon type="recycle" size={32} />
-                <span>Recycle Bin</span>
-              </div>
+              {desktopIcons.slice(2).map((icon, index) => (
+                <div 
+                  key={index}
+                  className="start-menu-item" 
+                  onClick={() => launchApp(icon.type as AppType)}
+                >
+                  <img src={getAssetPath(icon.icon)} alt={icon.title} width="32" height="32" />
+                  <span>{icon.title}</span>
+                </div>
+              ))}
             </div>
             
             <div className="start-menu-right">
               <div className="start-menu-item">
-                <img src="https://i.imgur.com/QMq4ItN.png" alt="Control Panel" />
+                <img src={getAssetPath('images/icons/windows.png')} alt="Control Panel" width="32" height="32" />
                 <span>Control Panel</span>
               </div>
               
               <div className="start-menu-item">
-                <img src="https://i.imgur.com/tSGT3Yi.png" alt="Help" />
+                <img src={getAssetPath('images/icons/question_mark.png')} alt="Help" width="32" height="32" />
                 <span>Help and Support</span>
               </div>
               
               <div className="start-menu-separator" />
               
-              <div className="start-menu-item">
-                <img src="https://i.imgur.com/RBBaQzk.png" alt="Log Off" />
-                <span>Log Off</span>
-      </div>
-      
-              <div className="start-menu-item">
-                <img src="https://i.imgur.com/FW2eW4L.png" alt="Shut Down" />
-                <span>Turn Off Computer</span>
+              <div className="start-menu-item" onClick={handleRestart}>
+                <img src={getAssetPath('images/icons/restart.png')} alt="Restart" width="32" height="32" />
+                <span>Restart</span>
+              </div>
+              
+              <div className="start-menu-item" onClick={handlePowerOff}>
+                <img src={getAssetPath('images/icons/poweroff.png')} alt="Power Off" width="32" height="32" />
+                <span>Power Off</span>
               </div>
             </div>
           </div>
-      </div>
+        </div>
       )}
     </div>
   );
 };
 
-export default App
+export default App;

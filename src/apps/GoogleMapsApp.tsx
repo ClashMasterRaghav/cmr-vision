@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AppWindow from '../components/AppWindow';
+import { getAssetPath } from '../utils/assetUtils';
 
 interface GoogleMapsAppProps {
   id: string;

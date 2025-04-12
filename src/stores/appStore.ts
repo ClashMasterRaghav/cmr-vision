@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 
 // Define the different app types
-export type AppType = 'videoPlayer' | 'youtube' | 'googleMaps' | 'browser' | 'notepad' | 'paint' | 'calculator';
+export type AppType = 'videoPlayer' | 'youtube' | 'googleMaps' | 'browser' | 'notepad' | 'paint' | 'calculator' | 'calendar' | 'myComputer' | 'recycleBin';
 
 // Define app window data structure
 export interface AppWindow {
@@ -14,6 +14,7 @@ export interface AppWindow {
   rotation: Vector3;
   scale: Vector3;
   isActive: boolean;
+  isMinimized: boolean;
   data: any; // App-specific data
 }
 
@@ -21,10 +22,11 @@ export interface AppWindow {
 interface AppState {
   apps: AppWindow[];
   activeAppId: string | null;
-  addApp: (appData: Omit<AppWindow, 'id'>) => void;
+  addApp: (appData: Omit<AppWindow, 'id' | 'isMinimized'>) => void;
   removeApp: (id: string) => void;
   setActiveApp: (id: string) => void;
   updateAppPosition: (id: string, position: Vector3) => void;
+  toggleMinimize: (id: string) => void;
 }
 
 // Create the store
@@ -44,7 +46,8 @@ export const useAppStore = create<AppState>((set) => ({
     const newApp: AppWindow = {
       ...appData,
       id: uuidv4(),
-      isActive: true
+      isActive: true,
+      isMinimized: false
     };
     
     return {
@@ -67,13 +70,30 @@ export const useAppStore = create<AppState>((set) => ({
   }),
   
   // Set the active app
-  setActiveApp: (id) => set((state) => ({
-    apps: state.apps.map(app => ({
-      ...app,
-      isActive: app.id === id
-    })),
-    activeAppId: id
-  })),
+  setActiveApp: (id) => set((state) => {
+    // Get the app to be activated
+    const appToActivate = state.apps.find(app => app.id === id);
+    
+    // If the app is minimized, unminimize it
+    if (appToActivate?.isMinimized) {
+      return {
+        apps: state.apps.map(app => ({
+          ...app,
+          isActive: app.id === id,
+          isMinimized: app.id === id ? false : app.isMinimized
+        })),
+        activeAppId: id
+      };
+    }
+    
+    return {
+      apps: state.apps.map(app => ({
+        ...app,
+        isActive: app.id === id
+      })),
+      activeAppId: id
+    };
+  }),
   
   // Update app position (for dragging)
   updateAppPosition: (id, position) => set((state) => ({
@@ -82,5 +102,19 @@ export const useAppStore = create<AppState>((set) => ({
         ? { ...app, position } 
         : app
     )
+  })),
+  
+  // Toggle minimize state
+  toggleMinimize: (id) => set((state) => ({
+    apps: state.apps.map(app => 
+      app.id === id 
+        ? { 
+            ...app, 
+            isMinimized: !app.isMinimized,
+            isActive: app.isMinimized // If it was minimized, make it active
+          } 
+        : app
+    ),
+    activeAppId: state.apps.find(app => app.id === id)?.isMinimized ? id : state.activeAppId
   }))
-})); 
+}));

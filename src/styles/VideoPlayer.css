@@ -1,0 +1,24 @@
+.video-player-container {
+  display: flex;
+  height: 100%;
+  background-color: #000;
+  color: white;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+}
+
+/* Customize video controls appearance */
+video::-webkit-media-controls-panel {
+  background-color: rgba(30, 30, 30, 0.7);
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-volume-slider,
+video::-webkit-media-controls-mute-button,
+video::-webkit-media-controls-fullscreen-button {
+  color: white;
+}
+
+/* For Firefox */
+video::-moz-range-thumb {
+  background-color: #2c83e0;
+} 

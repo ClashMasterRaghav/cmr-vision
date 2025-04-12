@@ -1,5 +1,6 @@
 import React from 'react';
 import Notepad from '../components/apps/Notepad';
+import { getAssetPath } from '../utils/assetUtils';
 
 interface NotepadAppProps {
   id: string;

@@ -7,6 +7,9 @@ import VideoPlayerApp from '../apps/VideoPlayerApp';
 import NotepadApp from '../apps/NotepadApp';
 import PaintApp from '../apps/PaintApp';
 import CalculatorApp from '../apps/CalculatorApp';
+import CalendarApp from '../apps/CalendarApp';
+import MyComputerApp from '../apps/MyComputerApp';
+import RecycleBinApp from '../apps/RecycleBinApp';
 
 interface VREnvironmentProps {
   activeAppId: string | null;
@@ -16,7 +19,8 @@ interface VREnvironmentProps {
 
 const VREnvironment: React.FC<VREnvironmentProps> = ({
   activeAppId,
-  onWindowClose
+  onWindowClose,
+  onWindowFocus
 }) => {
   const { apps } = useAppStore();
 
@@ -95,6 +99,39 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({
           case 'calculator':
             return (
               <CalculatorApp
+                key={app.id}
+                id={app.id}
+                title={app.title}
+                onClose={closeApp}
+                data={app.data}
+              />
+            );
+          
+          case 'calendar':
+            return (
+              <CalendarApp
+                key={app.id}
+                id={app.id}
+                title={app.title}
+                onClose={closeApp}
+                data={app.data}
+              />
+            );
+          
+          case 'myComputer':
+            return (
+              <MyComputerApp
+                key={app.id}
+                id={app.id}
+                title={app.title}
+                onClose={closeApp}
+                data={app.data}
+              />
+            );
+            
+          case 'recycleBin':
+            return (
+              <RecycleBinApp
                 key={app.id}
                 id={app.id}
                 title={app.title}

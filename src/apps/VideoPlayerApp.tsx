@@ -1,8 +1,10 @@
 import React from 'react';
 import AppWindow from '../components/AppWindow';
+import { getAssetPath } from '../utils/assetUtils';
+import '../styles/VideoPlayer.css';
 
 interface VideoPlayerAppProps {
-  id: string; // Needed for app identification but not used directly
+  id: string;
   title: string;
   onClose: () => void;
   data: {
@@ -10,12 +12,16 @@ interface VideoPlayerAppProps {
   };
 }
 
-const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ title, onClose, data }) => {
+const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, data }) => {
   // Use the video path from data, with fallback
-  const videoPath = data.videoSrc || '/videos/sample_video.mp4';
+  const videoPath = data.videoSrc || getAssetPath('videos/sample-video.mp4');
   
   return (
-    <AppWindow title={title} onClose={onClose}>
+    <AppWindow 
+      id={id}
+      title={title} 
+      onClose={onClose}
+    >
       <div className="video-player-container">
         <video
           controls

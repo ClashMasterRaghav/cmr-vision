@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import AppWindow from '../components/AppWindow';
+import { getAssetPath } from '../utils/assetUtils';
+import '../styles/Calculator.css';
 
 interface CalculatorAppProps {
   id: string; // Required for routing/identification even if not directly used

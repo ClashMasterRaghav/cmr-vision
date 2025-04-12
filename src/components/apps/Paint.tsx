@@ -1,5 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../../styles/Paint.css';
+import { getAssetPath } from '../../utils/assetUtils';
+// Import images
+import pencilIcon from '/images/icons/pencil.png';
+import eraserIcon from '/images/icons/eraser.png';
+import crossIcon from '/images/icons/cross.png';
+import undoIcon from '/images/icons/undo.png';
+import redoIcon from '/images/icons/redo.png';
 
 const Paint: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -173,30 +180,21 @@ const Paint: React.FC = () => {
             onClick={() => setTool('pencil')}
             title="Pencil"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-            </svg>
+            <img src={getAssetPath('images/icons/pencil.png')} alt="Pencil" width="16" height="16" />
           </button>
           <button 
             className={`paint-tool-button ${tool === 'eraser' ? 'active' : ''}`}
             onClick={() => setTool('eraser')}
             title="Eraser"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 13l-6 6-9-9 6-6L18 13z"></path>
-              <path d="M9 5l7 7"></path>
-            </svg>
+            <img src={getAssetPath('images/icons/eraser.png')} alt="Eraser" width="16" height="16" />
           </button>
           <button 
             className="paint-tool-button"
             onClick={clearCanvas}
             title="Clear Canvas"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="5" y1="5" x2="19" y2="19"></line>
-              <line x1="19" y1="5" x2="5" y2="19"></line>
-            </svg>
+            <img src={getAssetPath('images/icons/cross.png')} alt="Clear Canvas" width="16" height="16" />
           </button>
         </div>
         
@@ -207,10 +205,7 @@ const Paint: React.FC = () => {
             disabled={historyIndex <= 0}
             title="Undo"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 14 4 9 9 4"></polyline>
-              <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
-            </svg>
+            <img src={getAssetPath('images/icons/undo.png')} alt="Undo" width="16" height="16" />
           </button>
           <button 
             className="paint-tool-button"
@@ -218,10 +213,7 @@ const Paint: React.FC = () => {
             disabled={historyIndex >= history.length - 1}
             title="Redo"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 4 20 9 15 14"></polyline>
-              <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
-            </svg>
+            <img src={getAssetPath('images/icons/redo.png')} alt="Redo" width="16" height="16" />
           </button>
         </div>
         

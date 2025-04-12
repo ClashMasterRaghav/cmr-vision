@@ -1,12 +1,14 @@
 import React, { ReactNode, useState, useRef, useEffect } from 'react';
+import { useAppStore } from '../stores/appStore';
 
 interface AppWindowProps {
+  id: string;
   title: string;
   children: ReactNode;
   onClose?: () => void;
 }
 
-const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
+const AppWindow: React.FC<AppWindowProps> = ({ id, title, children, onClose }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [position, setPosition] = useState({ x: 50, y: 50 });
@@ -14,11 +16,23 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0 });
   const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [preMaximizeSize, setPreMaximizeSize] = useState({ width: 600, height: 400 });
+  const [preMaximizePosition, setPreMaximizePosition] = useState({ x: 50, y: 50 });
   const windowRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(false);
+  
+  // Get app state from store
+  const { setActiveApp, toggleMinimize } = useAppStore();
+  const { apps, activeAppId } = useAppStore();
+  const appData = apps.find(app => app.id === id);
+  const isActive = appData?.isActive || false;
+  const isMinimized = appData?.isMinimized || false;
 
   // Handle mouse down to start dragging
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Skip if maximized
+    if (isMaximized) return;
+    
     if (windowRef.current) {
       const rect = windowRef.current.getBoundingClientRect();
       setDragOffset({
@@ -26,13 +40,16 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
         y: e.clientY - rect.top
       });
       setIsDragging(true);
-      setActive(true);
+      setActiveApp(id);
     }
     e.stopPropagation();
   };
 
   // Handle mouse down to start resizing
   const handleResizeMouseDown = (e: React.MouseEvent) => {
+    // Skip if maximized
+    if (isMaximized) return;
+    
     if (windowRef.current) {
       setResizeStart({
         x: e.clientX,
@@ -43,7 +60,7 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
         height: size.height
       });
       setIsResizing(true);
-      setActive(true);
+      setActiveApp(id);
     }
     e.stopPropagation();
     e.preventDefault();
@@ -76,16 +93,45 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
     setIsResizing(false);
   };
 
-  // Set window as active on click
-  const handleWindowClick = () => {
-    setActive(true);
+  // Handle minimize window
+  const handleMinimize = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleMinimize(id);
   };
 
-  // Handle click outside to deactivate window
-  const handleClickOutside = (e: MouseEvent) => {
-    if (windowRef.current && !windowRef.current.contains(e.target as Node)) {
-      setActive(false);
+  // Handle maximize window
+  const handleMaximize = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!isMaximized) {
+      // Save current size and position before maximizing
+      setPreMaximizeSize({ width: size.width, height: size.height });
+      setPreMaximizePosition({ x: position.x, y: position.y });
+      
+      // Get viewport dimensions
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+      
+      // Maximize window
+      setSize({ width: vw - 10, height: vh - 50 });
+      setPosition({ x: 5, y: 5 });
+    } else {
+      // Restore pre-maximize size and position
+      setSize(preMaximizeSize);
+      setPosition(preMaximizePosition);
     }
+    
+    setIsMaximized(!isMaximized);
+  };
+
+  // Set window as active on click
+  const handleWindowClick = () => {
+    setActiveApp(id);
+  };
+
+  // Double click on header to maximize/restore
+  const handleHeaderDoubleClick = () => {
+    handleMaximize({ stopPropagation: () => {} } as React.MouseEvent);
   };
 
   // Add and remove event listeners
@@ -98,20 +144,19 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
       window.removeEventListener('mouseup', handleMouseUp);
     }
 
-    // Add global click handler for focus/active state
-    document.addEventListener('mousedown', handleClickOutside);
-
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isDragging, isResizing, dragOffset, resizeStart, initialSize]);
+
+  // Don't render if minimized
+  if (isMinimized) return null;
 
   return (
     <div 
       ref={windowRef}
-      className={`app-window ${active ? 'app-window-active' : ''}`}
+      className={`app-window ${isActive ? 'app-window-active' : ''} ${isMaximized ? 'app-window-maximized' : ''}`}
       style={{
         position: 'absolute',
         left: `${position.x}px`,
@@ -119,7 +164,7 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
         width: `${size.width}px`,
         height: `${size.height}px`,
         transform: isDragging ? 'scale(1.01)' : 'scale(1)',
-        zIndex: active ? 100 : 10,
+        zIndex: isActive ? 100 : 10,
         transition: isDragging || isResizing ? 'none' : 'transform 0.2s ease, box-shadow 0.3s ease',
       }}
       onClick={handleWindowClick}
@@ -127,9 +172,26 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
       <div 
         className="app-window-header"
         onMouseDown={handleMouseDown}
+        onDoubleClick={handleHeaderDoubleClick}
       >
         <h3 className="app-window-title">{title}</h3>
         <div className="app-window-controls">
+          <button className="app-window-minimize" onClick={handleMinimize}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+              <path d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/>
+            </svg>
+          </button>
+          <button className="app-window-maximize" onClick={handleMaximize}>
+            {isMaximized ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M4 8h16V4H4v4zm0 6h16v-4H4v4zm0 6h16v-4H4v4z"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V5h14v14z"/>
+              </svg>
+            )}
+          </button>
           <button className="app-window-close" onClick={onClose}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -140,14 +202,16 @@ const AppWindow: React.FC<AppWindowProps> = ({ title, children, onClose }) => {
       <div className="app-window-content" style={{ height: 'calc(100% - 30px)', overflow: 'hidden' }}>
         {children}
       </div>
-      <div 
-        className="resize-handle"
-        onMouseDown={handleResizeMouseDown}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M1 9L9 1M5 9L9 5M9 9L9 9" />
-        </svg>
-      </div>
+      {!isMaximized && (
+        <div 
+          className="resize-handle"
+          onMouseDown={handleResizeMouseDown}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M1 9L9 1M5 9L9 5M9 9L9 9" />
+          </svg>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AppWindow from '../AppWindow';
+import { getAssetPath } from '../../utils/assetUtils';
 
 interface NotepadProps {
   id?: string; // Optional now since we don't use it directly
