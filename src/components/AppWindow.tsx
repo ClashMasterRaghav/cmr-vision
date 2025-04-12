@@ -177,25 +177,13 @@ const AppWindow: React.FC<AppWindowProps> = ({ id, title, children, onClose }) =
         <h3 className="app-window-title">{title}</h3>
         <div className="app-window-controls">
           <button className="app-window-minimize" onClick={handleMinimize}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-              <path d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-            </svg>
+            –
           </button>
           <button className="app-window-maximize" onClick={handleMaximize}>
-            {isMaximized ? (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                <path d="M4 8h16V4H4v4zm0 6h16v-4H4v4zm0 6h16v-4H4v4z"/>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V5h14v14z"/>
-              </svg>
-            )}
+            ◻
           </button>
           <button className="app-window-close" onClick={onClose}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
+            × 
           </button>
         </div>
       </div>

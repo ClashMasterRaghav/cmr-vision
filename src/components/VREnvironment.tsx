@@ -10,6 +10,7 @@ import CalculatorApp from '../apps/CalculatorApp';
 import CalendarApp from '../apps/CalendarApp';
 import MyComputerApp from '../apps/MyComputerApp';
 import RecycleBinApp from '../apps/RecycleBinApp';
+import { zipSync } from 'three/examples/jsm/libs/fflate.module.js';
 
 interface VREnvironmentProps {
   activeAppId: string | null;
@@ -25,7 +26,8 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({
   const { apps } = useAppStore();
 
   return (
-    <div className="vr-environment">
+    <div className="vr-environment"
+    style={{zIndex: 1}}>
       {apps.map(app => {
         const closeApp = () => onWindowClose(app.id);
         

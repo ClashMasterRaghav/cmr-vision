@@ -100,15 +100,11 @@ const Calendar: React.FC = () => {
       <div className="calendar-header">
         <div className="calendar-nav">
           <button onClick={() => navigateMonth('prev')} className="calendar-nav-button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            ◀
           </button>
           <h2>{getMonthName(currentDate.getMonth())} {currentDate.getFullYear()}</h2>
           <button onClick={() => navigateMonth('next')} className="calendar-nav-button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            ▶
           </button>
         </div>
         <div className="calendar-toolbar">

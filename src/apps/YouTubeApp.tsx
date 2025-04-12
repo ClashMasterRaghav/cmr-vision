@@ -54,14 +54,12 @@ const YouTubeApp: React.FC<YouTubeAppProps> = ({ id, title, onClose, data }) => 
   };
   
   return (
-    <AppWindow title={title} onClose={onClose}>
+    <AppWindow id={id} title={title} onClose={onClose}>
       <div className="youtube-container">
         <div className="youtube-toolbar">
           <form onSubmit={handleSubmit} className="url-form">
             <div className="search-icon youtube-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/>
-              </svg>
+              <img src={getAssetPath('images/icons/small_search.png')} alt="Search" width="16" height="16"  style={{marginLeft: '5px'}}/>
             </div>
             <input
               type="text"
@@ -75,9 +73,7 @@ const YouTubeApp: React.FC<YouTubeAppProps> = ({ id, title, onClose, data }) => 
               {isLoading ? (
                 <div className="loader"></div>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
+                <p style={{fontSize: '12px', fontWeight: 'light', color: '#000000'}}>Go</p>
               )}
             </button>
           </form>

@@ -382,6 +382,7 @@ body {
   cursor: pointer;
   user-select: none;
   position: relative;
+  z-index: 3;
 }
 
 .desktop-icon:hover .icon-img {

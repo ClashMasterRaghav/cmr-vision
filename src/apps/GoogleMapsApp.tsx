@@ -16,8 +16,7 @@ const GoogleMapsApp: React.FC<GoogleMapsAppProps> = ({ id, title, onClose, data 
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(false);
-  // Default location (San Francisco)
-  const defaultLocation = { lat: 37.7749, lng: -122.4194 };
+  const defaultLocation = { lat: 23.0225, lng: 72.5714 };
   // Use the location and zoom from data or defaults
   const location = data.location || defaultLocation;
   const zoom = data.zoom || 12;
@@ -56,7 +55,7 @@ const GoogleMapsApp: React.FC<GoogleMapsAppProps> = ({ id, title, onClose, data 
   };
   
   return (
-    <AppWindow title={title} onClose={onClose}>
+    <AppWindow id={id} title={title} onClose={onClose}>
       <div className="maps-container" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div className="maps-toolbar" style={{ 
           height: '36px',
@@ -68,10 +67,7 @@ const GoogleMapsApp: React.FC<GoogleMapsAppProps> = ({ id, title, onClose, data 
         }}>
           <form onSubmit={handleSearch} className="url-form" style={{ flex: 1 }}>
             <div className="search-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+              <img src={getAssetPath('images/icons/small_search.png')} alt="Search" width="16" height="16"  style={{marginLeft: '5px'}}/>
             </div>
             <input
               type="text"
@@ -84,9 +80,7 @@ const GoogleMapsApp: React.FC<GoogleMapsAppProps> = ({ id, title, onClose, data 
               {isLoading ? (
                 <div className="loader"></div>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
+                <p style={{fontSize: '12px', fontWeight: 'light', color: '#000000'}}>Go</p>
               )}
             </button>
           </form>

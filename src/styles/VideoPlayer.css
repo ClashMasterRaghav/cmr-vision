@@ -1,9 +1,41 @@
 .video-player-container {
   display: flex;
+  flex-direction: column;
   height: 100%;
   background-color: #000;
   color: white;
   font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  position: relative;
+}
+
+.video-player-toolbar {
+  height: 30px;
+  background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
+  border-bottom: 1px solid #ACA899;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  width: 100%;
+  z-index: 5;
+}
+
+.video-select-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.video-select {
+  height: 22px;
+  font-size: 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #7F9DB9;
+  outline: none;
+  padding: 0 5px;
+}
+
+.video-select:hover {
+  border-color: #66afe9;
 }
 
 /* Customize video controls appearance */
@@ -21,4 +53,12 @@ video::-webkit-media-controls-fullscreen-button {
 /* For Firefox */
 video::-moz-range-thumb {
   background-color: #2c83e0;
+}
+
+/* Playback area */
+.video-playback-area {
+  padding-top: 30px;
+  width: 100%;
+  height: calc(100% - 30px);
+  background-color: #000000;
 } 

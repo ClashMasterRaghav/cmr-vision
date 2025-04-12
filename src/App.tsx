@@ -48,7 +48,21 @@ const App: React.FC = () => {
     switch (type) {
       case 'videoPlayer':
         title = 'Windows Media Player';
-        data = { videoSrc: getAssetPath('videos/sample-video.mp4') };
+        // Define available videos
+        const availableVideos = [
+          { name: 'Tek It', path: 'videos/sample-video.mp4' },
+          { name: 'Crystal Dolphine', path: 'videos/sample-video2.mp4' },
+          { name: 'Love is war', path: 'videos/sample-video3.mp4' }
+        ];
+        
+        // Create a video selector function for the video player
+        data = { 
+          videoSrc: getAssetPath(availableVideos[0].path),
+          availableVideos: availableVideos.map(video => ({
+            name: video.name,
+            path: getAssetPath(video.path)
+          }))
+        };
         break;
       case 'youtube':
         title = 'Video Player';
@@ -56,7 +70,7 @@ const App: React.FC = () => {
         break;
       case 'browser':
         title = 'Internet Explorer';
-        data = { url: 'https://www.ecosia.org/' };
+        data = { url: 'clashmasterraghav' };
         break;
       case 'googleMaps':
         title = 'Google Maps';

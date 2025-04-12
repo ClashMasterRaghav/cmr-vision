@@ -10,7 +10,7 @@ interface CalculatorAppProps {
   data: any;
 }
 
-const CalculatorApp: React.FC<CalculatorAppProps> = ({ title, onClose }) => {
+const CalculatorApp: React.FC<CalculatorAppProps> = ({ id, title, onClose }) => {
   const [display, setDisplay] = useState('0');
   const [operator, setOperator] = useState<string | null>(null);
   const [prevValue, setPrevValue] = useState<number | null>(null);
@@ -80,7 +80,7 @@ const CalculatorApp: React.FC<CalculatorAppProps> = ({ title, onClose }) => {
   };
   
   return (
-    <AppWindow title={title} onClose={onClose}>
+    <AppWindow id={id} title={title} onClose={onClose}>
       <div className="calculator-container">
         <div className="calculator-display">
           <div className="calculator-display-value">{display}</div>

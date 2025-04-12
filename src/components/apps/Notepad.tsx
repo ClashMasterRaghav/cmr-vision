@@ -11,7 +11,7 @@ interface NotepadProps {
   };
 }
 
-const Notepad: React.FC<NotepadProps> = ({ onClose, data = {} }) => {
+const Notepad: React.FC<NotepadProps> = ({ onClose, data = {}, id }) => {
   const [text, setText] = useState<string>(data.content || '');
   const [isSaved, setIsSaved] = useState<boolean>(true);
   const [fileName, setFileName] = useState<string>('Untitled.txt');
@@ -57,6 +57,7 @@ const Notepad: React.FC<NotepadProps> = ({ onClose, data = {} }) => {
   
   return (
     <AppWindow
+      id={id || 'notepad-' + Date.now().toString()}
       title={windowTitle}
       onClose={handleCloseWithCheck}
     >

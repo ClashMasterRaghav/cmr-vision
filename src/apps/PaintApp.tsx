@@ -9,15 +9,12 @@ interface PaintAppProps {
   data: any;
 }
 
-const PaintApp: React.FC<PaintAppProps> = ({ title, onClose }) => {
+const PaintApp: React.FC<PaintAppProps> = ({ id, title, onClose }) => {
   return (
     <AppWindow
+      id={id}
       title={title}
       onClose={onClose}
-      defaultWidth={800}
-      defaultHeight={600}
-      minWidth={400}
-      minHeight={300}
     >
       <Paint />
     </AppWindow>

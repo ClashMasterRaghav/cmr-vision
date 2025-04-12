@@ -10,15 +10,12 @@ interface CalendarAppProps {
   data: any;
 }
 
-const CalendarApp: React.FC<CalendarAppProps> = ({ title, onClose }) => {
+const CalendarApp: React.FC<CalendarAppProps> = ({ id, title, onClose }) => {
   return (
     <AppWindow
+      id={id}
       title={title}
       onClose={onClose}
-      defaultWidth={800}
-      defaultHeight={600}
-      minWidth={500}
-      minHeight={400}
     >
       <Calendar />
     </AppWindow>
