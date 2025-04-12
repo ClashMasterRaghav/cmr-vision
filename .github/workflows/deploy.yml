@@ -35,10 +35,25 @@ jobs:
           # Skip TypeScript checking by bypassing tsc completely
           echo "Skipping TypeScript check and building directly with Vite"
           npx vite build
+          
+      - name: Debug Build Output
+        run: |
+          echo "Checking build output files:"
+          ls -la dist
+          echo "Total files in dist:"
+          find dist -type f | wc -l
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
           branch: gh-pages
-          clean: true 
+          clean: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Deploy Status
+        run: |
+          echo "Deployment to GitHub Pages completed"
+          echo "If the page is not updating, check GitHub Pages settings at:"
+          echo "https://github.com/${{ github.repository }}/settings/pages"
+          echo "Ensure it's set to deploy from the gh-pages branch" 
