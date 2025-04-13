@@ -1,57 +1,108 @@
-# CMR Vision
+# CMR-VisionXP
 
-A WebXR AR application inspired by Apple Vision Pro, built with React, Three.js, React Three Fiber, and WebXR.
+A Windows XP simulation built with React and TypeScript, featuring a nostalgic UI experience with modern web technologies.
 
-## Features
+![CMR-VisionXP Screenshot](screenshot.png)
 
-The application includes 5 virtual applications that can be used in an AR environment:
+## 🌟 Features
 
-1. **Video Player** - Play local video files in AR space
-2. **YouTube** - Watch YouTube videos using embedded iframes
-3. **Google Maps** - Explore locations using Google Maps
-4. **Browser** - Browse the web with a simple browser interface
-5. **GitHub** - Access GitHub through an embedded view
+- **Authentic Windows XP Experience** - Complete with the classic blue taskbar, start menu, and iconic desktop elements
+- **Multiple Functional Applications**:
+  - **My Computer** - Browse virtual file system
+  - **Internet Explorer** - Simulated web browser
+  - **Windows Media Player** - Play videos with an authentic XP interface
+  - **Notepad** - Fully functional text editor
+  - **Paint** - Draw and create art
+  - **Calculator** - Perform basic calculations
+  - **Calendar** - View and manage events
+  - **Recycle Bin** - Delete and restore files
 
-## Technology Stack
+- **System Functionality**:
+  - Bootup and shutdown sequences
+  - Window management (minimize, maximize, close, resize)
+  - Smooth animations and transitions
+  - Start menu with program access
+  - Desktop icon interaction
 
-- React + TypeScript
-- Three.js
-- React Three Fiber
-- WebXR
-- Zustand (for state management)
+## 🛠️ Technology Stack
 
-## Development Setup
+- **Frontend**: React + TypeScript
+- **State Management**: Zustand
+- **Styling**: CSS (no external UI libraries)
+- **Build Tool**: Vite
 
-1. Install dependencies:
+## 🚀 Live Demo
+
+Experience the nostalgia: [CMR-VisionXP Demo](https://clashmasterraghav.github.io/cmr-vision/)
+
+## 💻 Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ClashMasterRaghav/cmr-vision.git
+   cd cmr-vision
    ```
+
+2. Install dependencies:
+   ```bash
    npm install
+   # or
+   yarn
    ```
 
-2. Start the development server:
-   ```
+3. Start the development server:
+   ```bash
    npm run dev
+   # or
+   yarn dev
    ```
 
-3. Open the application in a WebXR-capable browser
+4. Open your browser and navigate to `http://localhost:5173`
 
-## WebXR Requirements
+## 📁 Project Structure
 
-This application requires:
-- A WebXR-compatible browser (Chrome, Edge, Firefox with WebXR flags enabled)
-- For AR: A compatible AR-capable device (Android with ARCore, iOS with WebXR Viewer)
-- For VR: A compatible VR headset (Oculus Quest, HTC Vive, etc.)
+- `/src` - Source code
+  - `/apps` - Individual application components (Notepad, Paint, etc.)
+  - `/components` - Reusable UI components
+  - `/stores` - State management (Zustand)
+  - `/styles` - CSS stylesheets
+  - `/utils` - Utility functions
 
-## Project Structure
+## 🎯 Future Enhancements
 
-- `/src/components` - Core UI components
-- `/src/apps` - Individual application components
-- `/src/stores` - State management with Zustand
-- `/src/contexts` - React contexts for shared state
+- More applications (Minesweeper, Word, Excel)
+- File system persistence using localStorage
+- Improved error handling (Blue Screen of Death)
+- Sound effects and startup sounds
+- User accounts and login screen
 
-## Notes on Google Maps
+## 🤝 Contributing
 
-To use the Google Maps functionality, you'll need to replace `YOUR_API_KEY` in the GoogleMapsApp.tsx file with a valid Google Maps API key.
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
-## License
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-MIT
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgements
+
+- Original Windows XP design by Microsoft
+- Inspired by various web-based OS simulations
+- Icons and assets sourced from publicly available Windows XP resources
+
+---
+
+Made with ❤️ by [ClashMasterRaghav](https://github.com/ClashMasterRaghav)
