@@ -19,6 +19,7 @@ const AppWindow: React.FC<AppWindowProps> = ({ id, title, children, onClose }) =
   const [isMaximized, setIsMaximized] = useState(false);
   const [preMaximizeSize, setPreMaximizeSize] = useState({ width: 600, height: 400 });
   const [preMaximizePosition, setPreMaximizePosition] = useState({ x: 50, y: 50 });
+  const [isAnimatingMinimize, setIsAnimatingMinimize] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
   
   // Get app state from store
@@ -96,7 +97,17 @@ const AppWindow: React.FC<AppWindowProps> = ({ id, title, children, onClose }) =
   // Handle minimize window
   const handleMinimize = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toggleMinimize(id);
+    
+    // Start animation and then toggle minimized state
+    if (!isMinimized) {
+      setIsAnimatingMinimize(true);
+      setTimeout(() => {
+        toggleMinimize(id);
+        setIsAnimatingMinimize(false);
+      }, 500); // Animation duration increased to 500ms
+    } else {
+      toggleMinimize(id);
+    }
   };
 
   // Handle maximize window
@@ -150,22 +161,44 @@ const AppWindow: React.FC<AppWindowProps> = ({ id, title, children, onClose }) =
     };
   }, [isDragging, isResizing, dragOffset, resizeStart, initialSize]);
 
-  // Don't render if minimized
-  if (isMinimized) return null;
+  // Calculate taskbar position for minimize animation
+  const getTaskbarTarget = () => {
+    const taskbarApp = document.querySelector(`.taskbar-app[data-id="${id}"]`);
+    if (taskbarApp) {
+      const rect = taskbarApp.getBoundingClientRect();
+      return { x: rect.left, y: rect.bottom };
+    }
+    return { x: window.innerWidth / 2, y: window.innerHeight };
+  };
+
+  // Don't render if minimized (and not animating)
+  if (isMinimized && !isAnimatingMinimize) return null;
+
+  // Get taskbar position for animation target
+  const taskbarTarget = getTaskbarTarget();
 
   return (
     <div 
       ref={windowRef}
-      className={`app-window ${isActive ? 'app-window-active' : ''} ${isMaximized ? 'app-window-maximized' : ''}`}
+      className={`app-window ${isActive ? 'app-window-active' : ''} ${isMaximized ? 'app-window-maximized' : ''} ${isAnimatingMinimize ? 'app-window-minimizing' : ''}`}
       style={{
         position: 'absolute',
         left: `${position.x}px`,
         top: `${position.y}px`,
         width: `${size.width}px`,
         height: `${size.height}px`,
-        transform: isDragging ? 'scale(1.01)' : 'scale(1)',
-        zIndex: isActive ? 100 : 10,
-        transition: isDragging || isResizing ? 'none' : 'transform 0.2s ease, box-shadow 0.3s ease',
+        transform: isDragging 
+          ? 'scale(1.01)' 
+          : isAnimatingMinimize 
+            ? `translate(${taskbarTarget.x - position.x}px, ${taskbarTarget.y - position.y}px) scale(0.05)` 
+            : 'scale(1)',
+        zIndex: isActive ? 1000 : 500,
+        opacity: isAnimatingMinimize ? 0 : 1,
+        transition: isDragging || isResizing 
+          ? 'none' 
+          : isAnimatingMinimize 
+            ? 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out, box-shadow 0.5s ease-in-out' 
+            : 'transform 0.2s ease, box-shadow 0.3s ease',
       }}
       onClick={handleWindowClick}
     >

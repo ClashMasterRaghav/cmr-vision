@@ -36,9 +36,36 @@ const App: React.FC = () => {
   const { apps, addApp, removeApp, setActiveApp, toggleMinimize } = useAppStore();
   const activeAppId = apps.find(app => app.isActive)?.id || null;
   const [isShuttingDown, setIsShuttingDown] = useState(false);
+  const [isBlueScreenGlitch, setIsBlueScreenGlitch] = useState(false);
   const [isBooting, setIsBooting] = useState(false);
   const [showShutdownDialog, setShowShutdownDialog] = useState(false);
   const [shutdownAction, setShutdownAction] = useState<'restart' | 'poweroff' | null>(null);
+
+  // Check if this is a fresh load or part of restart process
+  useEffect(() => {
+    // Check if we should show the boot screen on initial load
+    const isRestarting = localStorage.getItem('isRestarting') === 'true';
+    
+    if (isRestarting) {
+      // We're in the middle of a restart, don't show boot screen
+      setIsBooting(false);
+      // Clear the restart flag after we've used it
+      localStorage.removeItem('isRestarting');
+    } else {
+      // This is a fresh load, show boot screen
+      setIsBooting(true);
+    }
+  }, []);
+
+  // Hide boot screen after 3 seconds
+  useEffect(() => {
+    if (isBooting) {
+      const timer = setTimeout(() => {
+        setIsBooting(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBooting]);
 
   const launchApp = (type: AppType) => {
     // Create default data based on app type
@@ -124,7 +151,7 @@ const App: React.FC = () => {
     if (app?.isMinimized) {
       toggleMinimize(id);
     } else {
-      setActiveApp(id);
+    setActiveApp(id);
     }
   };
 
@@ -181,14 +208,19 @@ const App: React.FC = () => {
     setIsShuttingDown(true);
     
     if (shutdownAction === 'restart') {
-      // Show shutdown screen for 2 seconds, then show boot screen, then refresh
+      // Set a flag to skip the boot screen when the page reloads
+      localStorage.setItem('isRestarting', 'true');
+      
+      // Show shutdown screen for 2 seconds, then show blue screen glitch, then reload
       setTimeout(() => {
+        // Show blue screen glitch for 200ms
         setIsShuttingDown(false);
-        setIsBooting(true);
-        // Show boot screen for 3 seconds before reloading
+        setIsBlueScreenGlitch(true);
+        
         setTimeout(() => {
+          // Reload the page after blue screen glitch without showing boot screen
           window.location.reload();
-        }, 3000);
+        }, 300);
       }, 2000);
     } else {
       // Close all apps for power off
@@ -220,6 +252,14 @@ const App: React.FC = () => {
                 <div key={index} className="shutdown-block"></div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+      
+      {isBlueScreenGlitch && (
+        <div className="bluescreen-glitch">
+          <div className="bluescreen-text">
+            A problem has been detected and Windows has been shut down to prevent damage to your computer.
           </div>
         </div>
       )}
@@ -288,7 +328,7 @@ const App: React.FC = () => {
 
       {/* Windows XP Environment with app windows */}
       <VREnvironment 
-        activeAppId={activeAppId}
+        activeAppId={activeAppId} 
         onWindowClose={removeApp}
         onWindowFocus={handleAppClick}
       />
@@ -312,6 +352,7 @@ const App: React.FC = () => {
               key={app.id}
               className={`taskbar-app ${app.id === activeAppId ? 'active' : ''}`}
               onClick={() => handleAppClick(app.id)}
+              data-id={app.id}
             >
               <img src={getAppIconPath(app.type)} alt={app.title} />
               <span>{app.title}</span>

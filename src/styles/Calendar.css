@@ -75,6 +75,12 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.calendar-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .calendar-day-header {
@@ -144,6 +150,12 @@
   border-top: 1px solid #ddd;
   max-height: 200px;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.calendar-events::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .calendar-events h3 {
