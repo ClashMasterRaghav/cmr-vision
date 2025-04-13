@@ -84,8 +84,9 @@ const Paint: React.FC = () => {
     if (!canvas || !contextRef.current) return;
     
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Calculate coordinates as a ratio of canvas dimensions
+    const x = (e.clientX - rect.left) / rect.width * canvas.width;
+    const y = (e.clientY - rect.top) / rect.height * canvas.height;
     
     contextRef.current.beginPath();
     contextRef.current.moveTo(x, y);
@@ -96,8 +97,9 @@ const Paint: React.FC = () => {
     if (!isDrawing || !contextRef.current || !canvasRef.current) return;
     
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Calculate coordinates as a ratio of canvas dimensions
+    const x = (e.clientX - rect.left) / rect.width * canvasRef.current.width;
+    const y = (e.clientY - rect.top) / rect.height * canvasRef.current.height;
     
     contextRef.current.lineTo(x, y);
     contextRef.current.stroke();
