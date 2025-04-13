@@ -11,14 +11,30 @@ interface AppWindowProps {
 const AppWindow: React.FC<AppWindowProps> = ({ id, title, children, onClose }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
+  const [position, setPosition] = useState(() => {
+    // Calculate center position of the screen
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    return { 
+      x: Math.max(0, (vw - 600) / 2),  // centered based on default width
+      y: Math.max(0, (vh - 400) / 3)   // slightly above center vertically
+    };
+  });
   const [size, setSize] = useState({ width: 600, height: 400 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0 });
   const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
   const [isMaximized, setIsMaximized] = useState(false);
   const [preMaximizeSize, setPreMaximizeSize] = useState({ width: 600, height: 400 });
-  const [preMaximizePosition, setPreMaximizePosition] = useState({ x: 50, y: 50 });
+  const [preMaximizePosition, setPreMaximizePosition] = useState(() => {
+    // Calculate center position for pre-maximize state too
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    return { 
+      x: Math.max(0, (vw - 600) / 2),
+      y: Math.max(0, (vh - 400) / 3)
+    };
+  });
   const [isAnimatingMinimize, setIsAnimatingMinimize] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
   
