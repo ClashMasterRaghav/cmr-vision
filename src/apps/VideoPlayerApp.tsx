@@ -73,6 +73,7 @@ const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, dat
             ref={videoRef}
             controls
             autoPlay
+            muted
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
           >
             <source src={currentVideoSrc} type="video/mp4" />

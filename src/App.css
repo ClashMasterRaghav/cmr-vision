@@ -1308,3 +1308,14 @@ iframe, video {
   100% { opacity: 0.4; }
 }
 
+/* White Screen Flash */
+.white-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 10001;
+}
+
