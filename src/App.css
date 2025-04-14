@@ -85,6 +85,8 @@ body {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   border: 1px solid #0054E3;
+  z-index: 10;
+  position: absolute;
 }
 
 .app-window-active {
@@ -372,7 +374,13 @@ body {
   grid-template-columns: repeat(auto-fill, 80px);
   gap: 20px;
   padding: 20px;
-  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Let clicks pass through the container */
+  z-index: 1;
 }
 
 .desktop-icon {
@@ -380,10 +388,16 @@ body {
   flex-direction: column;
   align-items: center;
   width: 80px;
+  height: 85px; /* Set fixed height to prevent full column capture */
   cursor: pointer;
   user-select: none;
   position: relative;
-  z-index: 3;
+  pointer-events: auto; /* Make icons clickable */
+  border-radius: 2px; /* Add a small border radius for selection aesthetic */
+}
+
+.desktop-icon:hover {
+  background-color: rgba(49, 106, 197, 0.1);
 }
 
 .desktop-icon:hover .icon-img {

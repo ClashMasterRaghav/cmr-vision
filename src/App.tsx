@@ -85,7 +85,7 @@ const App: React.FC = () => {
         break;
       case 'browser':
         title = 'Internet Explorer';
-        data = { url: 'clashmasterraghav' };
+        data = { url: 'https://www.indiatvnews.com/' };
         break;
       case 'googleMaps':
         title = 'Google Maps';
@@ -312,25 +312,13 @@ const App: React.FC = () => {
         </div>
       )}
       
-      {/* Desktop Icons */}
-      <div className="desktop-icons">
-        {desktopIcons.map((icon, index) => (
-          <div 
-            key={index}
-            className="desktop-icon" 
-            onClick={() => launchApp(icon.type as AppType)}
-          >
-            <img src={getAssetPath(icon.icon)} alt={icon.title} className="icon-img" />
-            <div className="icon-text">{icon.title}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Windows XP Environment with app windows */}
       <VREnvironment 
         activeAppId={activeAppId} 
         onWindowClose={removeApp}
         onWindowFocus={handleAppClick}
+        desktopIcons={desktopIcons}
+        onLaunchApp={launchApp}
       />
 
       {/* Windows XP Taskbar */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import AppWindow from '../components/AppWindow';
 import { getAssetPath } from '../utils/assetUtils';
 
@@ -17,6 +17,9 @@ const BrowserApp: React.FC<BrowserAppProps> = ({ id, title, onClose, data }) => 
   const [isLoading, setIsLoading] = useState(false);
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100); // 100% is default zoom
+  const [history, setHistory] = useState<string[]>([data.url]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   
   // Check if the input is a URL or a search query
   const isValidUrl = (string: string) => {
@@ -37,6 +40,24 @@ const BrowserApp: React.FC<BrowserAppProps> = ({ id, title, onClose, data }) => 
     }
   };
   
+  const navigateToUrl = (newUrl: string, updateHistory = true) => {
+    setIsLoading(true);
+    setUrl(newUrl);
+    
+    if (updateHistory) {
+      // Add the new URL to history, remove any forward history
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newUrl);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    }
+    
+    // Simulate loading state
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  };
+  
   const handleNavigate = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -52,22 +73,31 @@ const BrowserApp: React.FC<BrowserAppProps> = ({ id, title, onClose, data }) => 
         processedUrl = 'https://' + processedUrl;
       }
       
-      setIsLoading(true);
-      setUrl(processedUrl);
+      navigateToUrl(processedUrl);
     } else {
       // Process as search query
       setIsSearchMode(true);
-      setIsLoading(true);
       
       // Create Google search URL with the query
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(processedUrl)}&igu=1`;
-      setUrl(searchUrl);
+      navigateToUrl(searchUrl);
     }
-    
-    // Simulate loading state
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+  };
+  
+  const goBack = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      navigateToUrl(history[newIndex], false);
+    }
+  };
+  
+  const goForward = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      navigateToUrl(history[newIndex], false);
+    }
   };
   
   // Dynamic title for the browser window
@@ -97,6 +127,48 @@ const BrowserApp: React.FC<BrowserAppProps> = ({ id, title, onClose, data }) => 
           justifyContent: 'space-between',
           padding: '4px 8px'
         }}>
+          <div className="browser-navigation" style={{ display: 'flex', alignItems: 'center', marginRight: '8px' }}>
+            <button 
+              onClick={goBack} 
+              disabled={historyIndex <= 0}
+              style={{
+                width: '24px',
+                height: '24px',
+                backgroundColor: historyIndex <= 0 ? '#D4D0C8' : '#ECE9D8',
+                border: '1px solid #ACA899',
+                borderRadius: '2px',
+                cursor: historyIndex <= 0 ? 'default' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: '4px',
+                opacity: historyIndex <= 0 ? 0.5 : 1
+              }}
+              title="Go Back"
+            >
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#000000' }}>‹</span>
+            </button>
+            <button 
+              onClick={goForward} 
+              disabled={historyIndex >= history.length - 1}
+              style={{
+                width: '24px',
+                height: '24px',
+                backgroundColor: historyIndex >= history.length - 1 ? '#D4D0C8' : '#ECE9D8',
+                border: '1px solid #ACA899',
+                borderRadius: '2px',
+                cursor: historyIndex >= history.length - 1 ? 'default' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: historyIndex >= history.length - 1 ? 0.5 : 1
+              }}
+              title="Go Forward"
+            >
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#000000' }}>›</span>
+            </button>
+          </div>
+          
           <form onSubmit={handleNavigate} className="url-form" style={{ flex: 1 }}>
             <div className="search-icon">
               <img src={getAssetPath('images/icons/small_search.png')} alt="Search" width="16" height="16" style={{marginLeft: '5px'}}/>
@@ -113,7 +185,7 @@ const BrowserApp: React.FC<BrowserAppProps> = ({ id, title, onClose, data }) => 
               {isLoading ? (
                 <div className="loader"></div>
               ) : (
-                <img src={getAssetPath('images/icons/small_search.png')} alt="Search" width="16" height="16" />
+                <p style={{fontSize: '12px', fontWeight: 'light', color: '#000000'}}>Go</p>
               )}
             </button>
           </form>

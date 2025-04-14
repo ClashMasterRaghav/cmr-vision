@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppStore } from '../stores/appStore';
+import { useAppStore, AppType } from '../stores/appStore';
 import BrowserApp from '../apps/BrowserApp';
 import GoogleMapsApp from '../apps/GoogleMapsApp';
 import YouTubeApp from '../apps/YouTubeApp';
@@ -10,24 +10,48 @@ import CalculatorApp from '../apps/CalculatorApp';
 import CalendarApp from '../apps/CalendarApp';
 import MyComputerApp from '../apps/MyComputerApp';
 import RecycleBinApp from '../apps/RecycleBinApp';
-import { zipSync } from 'three/examples/jsm/libs/fflate.module.js';
+import { getAssetPath } from '../utils/assetUtils';
+
+interface DesktopIcon {
+  type: string;
+  title: string;
+  icon: string;
+}
 
 interface VREnvironmentProps {
   activeAppId: string | null;
   onWindowClose: (id: string) => void;
   onWindowFocus: (id: string) => void;
+  desktopIcons: DesktopIcon[];
+  onLaunchApp: (type: AppType) => void;
 }
 
 const VREnvironment: React.FC<VREnvironmentProps> = ({
   activeAppId,
   onWindowClose,
-  onWindowFocus
+  onWindowFocus,
+  desktopIcons,
+  onLaunchApp
 }) => {
   const { apps } = useAppStore();
 
   return (
-    <div className="vr-environment"
-    style={{zIndex: 1}}>
+    <div className="vr-environment" style={{zIndex: 1, position: 'relative'}}>
+      {/* Desktop Icons */}
+      <div className="desktop-icons">
+        {desktopIcons.map((icon, index) => (
+          <div 
+            key={index}
+            className="desktop-icon" 
+            onClick={() => onLaunchApp(icon.type as AppType)}
+          >
+            <img src={getAssetPath(icon.icon)} alt={icon.title} className="icon-img" />
+            <div className="icon-text">{icon.title}</div>
+          </div>
+        ))}
+      </div>
+      
+      {/* App Windows */}
       {apps.map(app => {
         const closeApp = () => onWindowClose(app.id);
         
