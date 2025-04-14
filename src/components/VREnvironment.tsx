@@ -10,6 +10,7 @@ import CalculatorApp from '../apps/CalculatorApp';
 import CalendarApp from '../apps/CalendarApp';
 import MyComputerApp from '../apps/MyComputerApp';
 import RecycleBinApp from '../apps/RecycleBinApp';
+import MinesweeperApp from '../apps/MinesweeperApp';
 import { getAssetPath } from '../utils/assetUtils';
 
 interface DesktopIcon {
@@ -158,6 +159,17 @@ const VREnvironment: React.FC<VREnvironmentProps> = ({
           case 'recycleBin':
             return (
               <RecycleBinApp
+                key={app.id}
+                id={app.id}
+                title={app.title}
+                onClose={closeApp}
+                data={app.data}
+              />
+            );
+          
+          case 'minesweeper':
+            return (
+              <MinesweeperApp
                 key={app.id}
                 id={app.id}
                 title={app.title}

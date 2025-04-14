@@ -28,6 +28,7 @@ const desktopIcons = [
   { type: 'paint', title: 'Paint', icon: 'images/icons/paint.png' },
   { type: 'calculator', title: 'Calculator', icon: 'images/icons/calculator.png' },
   { type: 'calendar', title: 'Calendar', icon: 'images/icons/calender.png' },
+  { type: 'minesweeper', title: 'Minesweeper', icon: 'images/icons/minesweeper.png' },
 ];
 
 const App: React.FC = () => {
@@ -114,6 +115,10 @@ const App: React.FC = () => {
       case 'recycleBin':
         title = 'Recycle Bin';
         data = { content: 'Recycle Bin is empty.' };
+        break;
+      case 'minesweeper':
+        title = 'Minesweeper';
+        data = {};
         break;
     }
 

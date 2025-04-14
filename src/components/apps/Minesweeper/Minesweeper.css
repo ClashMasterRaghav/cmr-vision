@@ -1,0 +1,217 @@
+/* Minesweeper Game Styles */
+.minesweeper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #c0c0c0;
+  padding: 8px;
+  user-select: none;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Header with controls */
+.minesweeper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 6px;
+  background-color: #c0c0c0;
+  border: 3px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+}
+
+/* Digital counter style */
+.minesweeper-counter {
+  background-color: #000;
+  color: #f00;
+  font-family: 'Digital', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 0 4px;
+  min-width: 60px;
+  text-align: right;
+  border: 2px inset #808080;
+}
+
+/* Controls container */
+.minesweeper-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Level selector */
+.minesweeper-level {
+  height: 30px;
+  background-color: #d1d1d1;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  font-size: 14px;
+  padding: 0 6px;
+  color: #000000;
+  font-weight: bold;
+}
+
+.minesweeper-level option {
+  color: #000000;
+  font-weight: normal;
+}
+
+/* Reset button (smiley face) */
+.minesweeper-reset {
+  width: 36px;
+  height: 36px;
+  background-color: #d1d1d1;
+  border: 3px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.minesweeper-reset:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+
+/* Game grid */
+.minesweeper-grid {
+  display: inline-flex;
+  flex-direction: column;
+  border: 3px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  margin: 0 auto;
+  background-color: #c0c0c0;
+  overflow: auto;
+  align-self: center;
+}
+
+/* Row of cells */
+.minesweeper-row {
+  display: flex;
+  align-self: center;
+}
+
+/* Individual cell */
+.cell {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  background-color: #d1d1d1;
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  cursor: pointer;
+  position: relative;
+}
+
+.cell:active:not(.revealed):not(.flagged):not(.question) {
+  border-color: #808080 #d1d1d1 #d1d1d1 #808080;
+}
+
+/* Revealed cell */
+.cell.revealed {
+  border: 1px solid #808080;
+  background-color: #d1d1d1;
+  border-color: #adadad;
+}
+
+/* Cell with mine */
+.cell.mine {
+  background-color: #ff0000;
+}
+
+.cell.mine::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #000;
+  position: absolute;
+}
+
+/* Numbers with different colors */
+.cell.count-1 { color: #0000ff; }
+.cell.count-2 { color: #008000; }
+.cell.count-3 { color: #ff0000; }
+.cell.count-4 { color: #000080; }
+.cell.count-5 { color: #800000; }
+.cell.count-6 { color: #008080; }
+.cell.count-7 { color: #000000; }
+.cell.count-8 { color: #808080; }
+
+/* Flag styling */
+.cell.flagged {
+  color: #ff0000;
+}
+
+/* Question mark styling */
+.cell.question {
+  color: #000;
+  font-weight: bold;
+}
+
+/* Game over styling */
+.minesweeper-grid.game-over .cell.mine {
+  background-color: #ff0000;
+}
+
+/* Adjust grid size based on difficulty level */
+.minesweeper-grid.level-beginner {
+  width: calc(9 * 24px + 18px); /* 9 cells + borders */
+  height: calc(9 * 24px + 18px);
+}
+
+.minesweeper-grid.level-intermediate {
+  width: calc(16 * 24px + 18px); /* 16 cells + borders */
+  height: calc(16 * 24px + 18px);
+}
+
+.minesweeper-grid.level-expert {
+  width: calc(30 * 24px + 18px); /* 30 cells + borders */
+  height: calc(16 * 24px + 18px);
+}
+
+/* Footer with hints */
+.minesweeper-footer {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.minesweeper-hint {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #efefef;
+  border: 1px solid #808080;
+}
+
+.minesweeper-hint code {
+  background-color: #e3e3e3;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.minesweeper-hint .key {
+  color: #ec433c;
+  font-weight: bold;
+}
+
+.minesweeper-hint .click {
+  color: #2a48ec;
+  font-weight: bold;
+}
+
+/* Make sure grid is scrollable in smaller windows */
+@media (max-height: 600px) {
+  .minesweeper-grid {
+    max-height: calc(100vh - 200px);
+    overflow: auto;
+  }
+} 
