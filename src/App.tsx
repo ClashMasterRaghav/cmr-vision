@@ -66,9 +66,9 @@ const App: React.FC = () => {
         title = 'Windows Media Player';
         // Define available videos
         const availableVideos = [
-          { name: 'Tek It', path: '/videos/sample-video.mp4' },
-          { name: 'Crystal Dolphine', path: '/videos/sample-video2.mp4' },
-          { name: 'Love is war', path: '/videos/sample-video3.mp4' }
+          { name: 'Tek It', path: '/videos/samplevideo1.mp4' },
+          { name: 'Crystal Dolphine', path: '/videos/samplevideo2.mp4' },
+          { name: 'The Old Kanye', path: '/videos/samplevideo3.mp4' }
         ];
         
         // Create a video selector function for the video player
