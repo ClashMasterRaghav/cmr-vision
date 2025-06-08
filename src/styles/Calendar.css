@@ -131,14 +131,15 @@
 .calendar-day-event-indicator {
   position: absolute;
   bottom: 5px;
-  left: 5px;
+  right: 5px;
   display: flex;
   justify-content: center;
 }
 
 .calendar-dot {
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
+  margin-bottom: 1px;
   background-color: #4285f4;
   border-radius: 50%;
   display: inline-block;

@@ -132,7 +132,7 @@ const Calendar: React.FC = () => {
         <div className="calendar-add-event">
           <h3>Add event for {selectedDate.toLocaleDateString()}</h3>
           <div className="calendar-event-form">
-            <input
+            <input style={{backgroundColor: 'transparent', color: 'black'}}
               type="text"
               value={newEvent}
               onChange={(e) => setNewEvent(e.target.value)}
