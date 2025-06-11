@@ -21,7 +21,7 @@ interface VideoPlayerAppProps {
 const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, data }) => {
   // Use video data with fallbacks
   const availableVideos = data.availableVideos || [];
-  const [currentVideoSrc, setCurrentVideoSrc] = useState(data.videoSrc || getAssetPath('../public/videos/samplevideo1.mp4'));
+  const [currentVideoSrc, setCurrentVideoSrc] = useState(data.videoSrc || getAssetPath('videos/samplevideo1.mp4'));
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Handle video selection change
