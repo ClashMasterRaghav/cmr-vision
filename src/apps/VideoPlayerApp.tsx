@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import AppWindow from '../components/AppWindow';
 import { getAssetPath } from '../utils/assetUtils';
 import '../styles/VideoPlayer.css';
@@ -24,16 +24,22 @@ const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, dat
   const [currentVideoSrc, setCurrentVideoSrc] = useState(data.videoSrc || '/videos/samplevideo1.mp4');
   const videoRef = useRef<HTMLVideoElement>(null);
   
+  // Handle video playback when source changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      // Play after a brief delay to ensure source is loaded
+      const playTimer = setTimeout(() => {
+        videoRef.current?.play().catch(err => console.log('Autoplay failed:', err));
+      }, 100);
+      return () => clearTimeout(playTimer);
+    }
+  }, [currentVideoSrc]);
+  
   // Handle video selection change
   const handleVideoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSrc = e.target.value;
     setCurrentVideoSrc(newSrc);
-    
-    // Reset video when source changes
-    if (videoRef.current) {
-      videoRef.current.load();
-      videoRef.current.play().catch(err => console.log('Autoplay failed:', err));
-    }
   };
   
   return (
@@ -66,8 +72,7 @@ const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, dat
               )}
             </select>
           </div>
-        </div>
-        
+        </di
         <div className="video-playback-area">
           <video
             ref={videoRef}
