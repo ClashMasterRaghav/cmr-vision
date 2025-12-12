@@ -72,7 +72,7 @@ const VideoPlayerApp: React.FC<VideoPlayerAppProps> = ({ id, title, onClose, dat
               )}
             </select>
           </div>
-        </di
+        </div>
         <div className="video-playback-area">
           <video
             ref={videoRef}
